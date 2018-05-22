@@ -5,7 +5,6 @@
 %         - CV (the Cramer-von Mises test)
 %         - DC (the Chebyshev Distance test)
 %         - DE (the Euclidean Distance test)
-%         - DM (the Manhattan Distance test)
 %         - FR (the Freedman modification of the Watson's U2 test)
 %         - G2 (the Loglikelihood Ratio test)
 %         - J2 (the Joenssen's J2 test)
@@ -38,7 +37,7 @@ function [h0,stat,pval] = benford_test(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('bd',@(x)validateattributes(x,{'BenfordData'},{'scalar'}));
-        p.addRequired('test',@(x)any(validatestring(x,{'AD','CV','DC','DE','DM','FR','G2','J2','JD','JS','KS','KU','MA','T2','U2','X2'})));
+        p.addRequired('test',@(x)any(validatestring(x,{'AD','CV','DC','DE','FR','G2','J2','JD','JS','KS','KU','MA','T2','U2','X2'})));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
         p.addOptional('sims',10000,@(x)validateattributes(x,{'numeric'},{'scalar','integer','real','finite','>=',1000}));
     end
@@ -51,10 +50,8 @@ function [h0,stat,pval] = benford_test(varargin)
     a = res.a;
     sims = res.sims;
 
-    if ((nargin == 4) && ~any(strcmp(test,{'DC' 'DE' 'DM' 'FR' 'J2'})))
-        ok = {'DC' 'DE' 'DM' 'FR' 'J2'};
-        ok = [sprintf(['%s' ', '],ok{1:end-1}) ok{end}];
-        error(['The ''sims'' parameter should only be specified for tests based on Monte Carlo simulations (' ok ').']);
+    if ((nargin == 4) && ~any(strcmp(test,{'DC' 'DE' 'FR' 'J2'})))
+        error('The ''sims'' parameter should only be specified for tests based on Monte Carlo simulations (DC, DE, FR, J2).');
     end
 
     switch (nargout)
@@ -84,9 +81,6 @@ function [h0,stat,pval] = benford_test_internal(bd,test,a,sims)
 
         case 'DE'
             [stat_int,pval_int] = calculate_de(bd.Table,sims);
-            
-        case 'DM'
-            [stat_int,pval_int] = calculate_dm(bd.Table,sims);
         
         case 'FR'
             [stat_int,pval_int] = calculate_fr(bd.Table,sims);
@@ -258,29 +252,6 @@ function [stat,pval] = calculate_de(tab,sims)
     end
 
 	stat = adj * sqrt(sum((emp_p - the_p) .^ 2));
-
-    pval = sum(h0 >= (stat - 1e-8)) / sims;
-
-end
-
-function [stat,pval] = calculate_dm(tab,sims)
-
-    k = height(tab);
-    n = sum(tab.Count);
-    adj = sqrt(n);
-
-    emp_p = tab.EmpP;
-    the_f = tab.TheF;
-    the_p = tab.TheP;
-
-    h0 = zeros(1,sims);
-
-    for i = 1:sims
-        emp_p_sim = simulate_frequency(the_f,k,n);
-        h0(i) = adj * sum(abs(emp_p_sim - the_p));
-    end
-
-	stat = adj * sum(abs(emp_p - the_p));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
 
