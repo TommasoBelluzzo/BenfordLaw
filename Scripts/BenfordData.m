@@ -1,5 +1,5 @@
 classdef BenfordData 
-    %% Properties: Instance   
+    %% Properties: Instance
     properties (GetAccess = public, SetAccess = private)
         OriginalSample;
         Sample;
