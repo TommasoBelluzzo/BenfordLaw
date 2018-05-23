@@ -1,5 +1,5 @@
 classdef BenfordData 
-    %% Properties: Instance
+    %% Properties: Instance   
     properties (GetAccess = public, SetAccess = private)
         OriginalSample;
         Sample;
@@ -14,4 +14,4 @@ classdef BenfordData
             this.Table = t;
         end
     end
-end1
+end
