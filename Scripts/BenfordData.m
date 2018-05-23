@@ -14,5 +14,4 @@ classdef BenfordData
             this.Table = t;
         end
     end
-end
-1
+end1
