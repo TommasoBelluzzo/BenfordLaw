@@ -1,29 +1,24 @@
 % [INPUT]
 % bd   = An instance of the BenfordData class produced by the "benford_analyse" function.
 % test = A string representing the test to perform, its value can be one of the following:
-%         - AD (the Anderson-Darling test)
-%         - CV (the Cramer-von Mises test)
-%         - DC (the Chebyshev Distance test)
-%         - DE (the Euclidean Distance test)
-%         - FR (the Freedman modification of the Watson's U2 test)
-%         - G2 (the Loglikelihood Ratio test)
-%         - J2 (the Joenssen's J2 test)
-%         - JD (the Hotelling's Joint Digits test)
-%         - JS (the Judge-Schechter Mean Deviation test)
-%         - KS (the Kolmogorov-Smirnov test)
-%         - KU (the Kuiper test)
-%         - MA (the Mantissa Arc test)
-%         - T2 (the Freeman-Tukey T2 test)
-%         - U2 (the Watson's U2 test)
-%         - X2 (the Pearson's X2 test)       
+%         - AD for the Anderson-Darling test (Choulakian, 1994)
+%         - CV for the Cramer-von Mises test (Choulakian, 1994)
+%         - DC for the Chebyshev Distance test (Leemis, 2000)
+%         - DE for the Euclidean Distance test (Cho & Gaines, 2007)
+%         - FR for the Freedman's U2 test (Freedman, 1981)
+%         - G2 for the Likelihood Ratio test (Neyman & Pearson, 1933)
+%         - J2 for the Joenssen's J2 test (Joenssen, 2014)
+%         - JD for the Hotelling's Joint Digits test (Hotelling, 1931)
+%         - JS for the Judge-Schechter Mean Deviation test (Judge & Schechter, 2009)
+%         - KS for the Kolmogorov-Smirnov test (Kolomonorgov, 1933)
+%         - KU for the Kuiper test (Kuiper, 1960)
+%         - MA for the Mantissa Arc test (Alexander, 2009)
+%         - T2 for the Freeman-Tukey T2 test (Freeman & Tukey, 1950)
+%         - U2 for the Watson's U2 test (Choulakian, 1994)
+%         - X2 for the Pearson's X2 test (Pearson, 1900)
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the test (optional, default=0.05).
 % sims = An integer representing the number of Monte Carlo simulations to perform (optional, default=10000).
-%        It should only be specified for the following tests that don't implement an asymptotic p-value computation:
-%         - DC (the Chebyshev Distance test)
-%         - DE (the Euclidean Distance test)
-%         - DM (the Manhattan Distance test)
-%         - FR (the Freedman modification of the Watson's U2 test)
-%         - J2 (the Joenssen's J2 test)
+%        It should only be specified for the following tests that don't implement an asymptotic p-value computation: DC, DE, FR, J2.
 %
 % [OUTPUT]
 % h0   = A boolean indicating whether the null hypothesis is accepted (true) or rejected (false).
@@ -39,7 +34,7 @@ function [h0,stat,pval] = benford_test(varargin)
         p.addRequired('bd',@(x)validateattributes(x,{'BenfordData'},{'scalar'}));
         p.addRequired('test',@(x)any(validatestring(x,{'AD','CV','DC','DE','FR','G2','J2','JD','JS','KS','KU','MA','T2','U2','X2'})));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
-        p.addOptional('sims',10000,@(x)validateattributes(x,{'numeric'},{'scalar','integer','real','finite','>=',1000}));
+        p.addOptional('sims',10000,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',1000}));
     end
 
     p.parse(varargin{:});
@@ -116,8 +111,8 @@ function [h0,stat,pval] = benford_test_internal(bd,test,a,sims)
             [stat_int,pval_int] = calculate_x2(bd.Table);
     end
 
-	h0 = pval_int >= a;
-    
+    h0 = pval_int >= a;
+
     if (nargout > 1)
         stat = stat_int;
         pval = pval_int;
@@ -228,7 +223,7 @@ function [stat,pval] = calculate_dc(tab,sims)
         h0(i) = adj * max(abs(emp_p_sim - the_p));
     end
 
-	stat = adj * max(abs(emp_p - the_p));
+    stat = adj * max(abs(emp_p - the_p));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
 
@@ -251,7 +246,7 @@ function [stat,pval] = calculate_de(tab,sims)
         h0(i) = adj * sqrt(sum((emp_p_sim - the_p) .^ 2));
     end
 
-	stat = adj * sqrt(sum((emp_p - the_p) .^ 2));
+    stat = adj * sqrt(sum((emp_p - the_p) .^ 2));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
 
@@ -277,7 +272,7 @@ function [stat,pval] = calculate_fr(tab,sims)
     end
 
     diff_f = cumsum(emp_p - the_p);
-	stat = adj * ((sum(diff_f .^ 2) * k) - (sum(diff_f) ^ 2));
+    stat = adj * ((sum(diff_f .^ 2) * k) - (sum(diff_f) ^ 2));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
 
@@ -291,7 +286,7 @@ function [stat,pval] = calculate_g2(tab)
     emp_p = tab.EmpP;
     the_p = tab.TheP;
 
-    stat = 2 * n * sum((emp_p .* log_safe(emp_p)) - (emp_p .* log_safe(the_p)));
+    stat = 2 * n * sum((emp_p .* log(emp_p + eps())) - (emp_p .* log(the_p + eps())));
     
     pval = 1 - chi2cdf(stat,(k - 1));
 
@@ -318,7 +313,7 @@ function [stat,pval] = calculate_j2(tab,sims)
     r = corr(emp_p,the_p);
     stat = sign(r) * (r ^ 2);
 
-	pval = sum(h0 >= (stat - 1e-8)) / sims;
+    pval = sum(h0 >= (stat - 1e-8)) / sims;
 
 end
 
@@ -328,7 +323,7 @@ function [stat,pval] = calculate_jd(tab)
     n = sum(tab.Count);
 
     emp_p = tab.EmpP;
-	the_p = tab.TheP;
+    the_p = tab.TheP;
 
     cm = -1 .* (the_p * the_p.');
     cm(logical(eye(k))) = the_p .* (1 - the_p);
@@ -390,7 +385,7 @@ function [stat,pval] = calculate_ks(tab)
     emp_f = tab.EmpF;
     the_f = tab.TheF;
 
-	stat = (sqrt(n) + 0.120 + (0.110 / sqrt(n))) * max(abs(emp_f - the_f));
+    stat = (sqrt(n) + 0.120 + (0.110 / sqrt(n))) * max(abs(emp_f - the_f));
 
     pval = 2 * exp(-2 * (stat ^ 2));
 
@@ -403,7 +398,7 @@ function [stat,pval] = calculate_ku(tab)
     emp_f = tab.EmpF;
     the_f = tab.TheF;
 
-	stat = (sqrt(n) + 0.155 + (0.240 / sqrt(n))) * (max(emp_f - the_f) + max(the_f - emp_f));
+    stat = (sqrt(n) + 0.155 + (0.240 / sqrt(n))) * (max(emp_f - the_f) + max(the_f - emp_f));
 
     pval = ((8 * (stat ^ 2)) - 2) * exp(-2 * (stat ^ 2));
 
@@ -495,12 +490,8 @@ function [stat,pval] = calculate_x2(tab)
 
     stat = n * sum(((emp_p - the_p) .^ 2) ./ the_p);
 
-	pval = 1 - chi2cdf(stat,(k - 1));
+    pval = 1 - chi2cdf(stat,(k - 1));
 
-end
-
-function f = log_safe(f)
-    f = log(f + eps());
 end
 
 function sim = simulate_frequency(the_f,k,n)

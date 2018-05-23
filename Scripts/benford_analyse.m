@@ -9,13 +9,13 @@
 %         - OriginalSample: a vector containing the valid observations.
 %         - Sample: a vector containing the post-processed valid observations.
 %         - Table: a kx7 table with the following columns:
-%            ~ Digits: the ordered sequence of the first significant digits.
-%            ~ Count: the number of occurrences of each first significant digit.
-%            ~ TheP: the theoretical frequency of each first significant digit.
-%            ~ EmpP: the empirical frequency of each first significant digit.
-%            ~ TheF: the theoretical cumulative frequency of the first significant digits.
-%            ~ EmpF: the empirical cumulative frequency of the first significant digits.
-%            ~ Z: the Z-score of each first significant digit.
+%            > Digits: the ordered sequence of the first significant digits.
+%            > Count: the number of occurrences of each first significant digit.
+%            > TheP: the theoretical frequency of each first significant digit.
+%            > EmpP: the empirical frequency of each first significant digit.
+%            > TheF: the theoretical cumulative frequency of the first significant digits.
+%            > EmpF: the empirical cumulative frequency of the first significant digits.
+%            > Z: the Z-score of each first significant digit.
 
 function bd = benford_analyse(varargin)
 
@@ -24,7 +24,7 @@ function bd = benford_analyse(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('data',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
-        p.addRequired('d',@(x)validateattributes(x,{'numeric'},{'scalar','integer','real','finite','>=',1,'<=',3}));
+        p.addRequired('d',@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',1,'<=',3}));
         p.addOptional('sec',false,@(x)validateattributes(x,{'logical'},{'scalar'}));
         p.addOptional('ccf',true,@(x)validateattributes(x,{'logical'},{'scalar'}));
     end
@@ -58,7 +58,7 @@ function bd = benford_analyse_internal(data,d,sec,ccf)
 
     data_orig = data;
 
-	data = abs(data);
+    data = abs(data);
 
     if (sec)
         data = sort(data);
@@ -68,15 +68,14 @@ function bd = benford_analyse_internal(data,d,sec,ccf)
     
     data_len = numel(data);
 
-    the = benford_distribution(d);
-    the_dtgs = the.Digits;
-    the_p = the.P;
-    the_f = the.F;
+    the_dgts = ((10 ^ (d - 1)):((10 ^ d) - 1)).';
+    the_p = log10(1 + (1 ./ the_dgts));
+    the_f = cumsum(the_p);
     
     emp_dgts = (10 .^ ((floor(log10(data)) .* -1) + d - 1)) .* data;
     emp_dgts = emp_dgts - rem(emp_dgts,1);
     
-    emp_hist = histcounts(emp_dgts,[the_dtgs; Inf]).';
+    emp_hist = histcounts(emp_dgts,[the_dgts; Inf]).';
     emp_p = emp_hist ./ data_len;
     emp_f = cumsum(emp_p);
 
@@ -92,7 +91,7 @@ function bd = benford_analyse_internal(data,d,sec,ccf)
     
     emp_z = z_num ./ z_den;
 
-    tab = table(the_dtgs,emp_hist,the_p,emp_p,the_f,emp_f,emp_z);
+    tab = table(the_dgts,emp_hist,the_p,emp_p,the_f,emp_f,emp_z);
     tab.Properties.VariableNames = {'Digits' 'Count' 'TheP' 'EmpP' 'TheF' 'EmpF' 'Z'};
     
     bd = BenfordData(data_orig,data,tab);
