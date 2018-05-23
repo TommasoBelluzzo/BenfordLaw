@@ -1,13 +1,13 @@
 classdef BenfordData 
     %% Properties: Instance
-	properties (GetAccess = public, SetAccess = private)
+    properties (GetAccess = public, SetAccess = private)
         OriginalSample;
         Sample;
         Table;
     end
 
     %% Constructor
-	methods (Access = public)
+    methods (Access = public)
         function this = BenfordData(os,s,t)
             this.OriginalSample = os;
             this.Sample = s;
