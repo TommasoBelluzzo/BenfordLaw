@@ -47,16 +47,15 @@ end
 
 function r = benford_random_internal(size,lim,mag,prob)
 
-    ben_p = log10(1 + (1 ./ (1:9).'));
-    ben_f = cumsum(ben_p);
-    
     x_len = prod(size);
-    x = arrayfun(@(x) find(x <= ben_f,1,'first'),rand(x_len,1));
+    x_p = log10(1 + (1 ./ (1:9).'));
+    x = datasample(1:9,x_len,'Weights',x_p);
 
     if strcmp(prob,'MAG')
         p = ones(mag,1) ./ mag;
     else
-        p = [9; (9 .* (10 .^ ((2:mag-1).' - 1))); ((9 * (10 ^ (mag - 1))) - ((10 ^ mag) - lim))] ./ lim;
+        p = [9; (9 .* (10 .^ ((2:mag-1).' - 1)))] ./ lim;
+        p(end + 1) = 1 - sum(p);
     end
 
     idx = 1;
@@ -88,10 +87,13 @@ function x = add_digit(x,stop,lim)
     end
     
     while (true)
-        d = floor(10 * rand());
-        out = (x * 10) + d;
+        p_dgt = numel(num2str(x)) + 1;
+        p_ran = (10 ^ (p_dgt - 2)):((10 ^ (p_dgt - 1)) - 1);
+        p = arrayfun(@(d) sum(log10(1 + (1 ./ ((10 .* p_ran) + d)))),0:9).';
 
-        if out <= lim
+        out = (x * 10) + datasample(0:9,1,'Weights',p);
+
+        if (out <= lim)
             x = out;
             break;
         end

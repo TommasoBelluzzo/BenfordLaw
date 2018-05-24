@@ -496,7 +496,7 @@ end
 
 function sim = simulate_frequency(the_f,k,n)
 
-    idx = arrayfun(@(x) find(x <= the_f,1,'first'),rand(1,n));
-    sim = (histcounts(idx,[1:k Inf]) ./ n).';
+    x = arrayfun(@(x) find(x <= the_f,1,'first'),rand(1,n));
+    sim = (histcounts(x,[1:k Inf]) ./ n).';
 
 end
