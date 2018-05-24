@@ -49,7 +49,7 @@ function r = benford_random_internal(size,lim,mag,prob)
 
     x_len = prod(size);
     x_p = log10(1 + (1 ./ (1:9).'));
-    x = datasample(1:9,x_len,'Weights',x_p);
+    x = datasample(1:9,x_len,'Weights',x_p).';
 
     if strcmp(prob,'MAG')
         p = ones(mag,1) ./ mag;
@@ -62,15 +62,11 @@ function r = benford_random_internal(size,lim,mag,prob)
     stop = false(x_len,1);
 
     while (~all(stop))
-        stop_neg = ~stop;
-        x_max = (x .* 10) >= lim;
-        stop(stop_neg & x_max) = true;
-        
-        stop_neg = ~stop;
-        p_stop = rand(x_len,1) < p(idx);
-        stop(stop_neg & p_stop) = true;
+        idx_true = ~stop & (((x .* 10) >= lim) | (rand(x_len,1) < p(idx)));
+        stop(idx_true) = true;
 
-        x = arrayfun(@(n,s) add_digit(n,s,lim),x,stop);
+        idx_false = ~idx_true;
+        x(idx_false) = arrayfun(@(n) add_digit(n,lim),x(idx_false));
 
         idx = idx + 1;
     end
@@ -80,12 +76,8 @@ function r = benford_random_internal(size,lim,mag,prob)
 
 end
 
-function x = add_digit(x,stop,lim)
+function x = add_digit(x,lim)
 
-    if (stop)
-        return;
-    end
-    
     while (true)
         p_dgt = numel(num2str(x)) + 1;
         p_ran = (10 ^ (p_dgt - 2)):((10 ^ (p_dgt - 1)) - 1);
