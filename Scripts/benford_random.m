@@ -8,9 +8,6 @@
 %
 % [OUTPUT]
 % r    = An array of Benford's Law conforming random numbers.
-%
-% [NOTES]
-% Credit goes to Jan Zdenek, the author of the original code.
 
 function r = benford_random(varargin)
 
@@ -48,27 +45,32 @@ end
 function r = benford_random_internal(size,lim,mag,prob)
 
     x_len = prod(size);
-    x_p = log10(1 + (1 ./ (1:9).'));
-    x = datasample(1:9,x_len,'Weights',x_p).';
+    x = datasample(1:9,x_len,'Weights',log10(1 + (1 ./ (1:9).'))).';
 
     if strcmp(prob,'MAG')
-        p = ones(mag,1) ./ mag;
+        p_sam = ones(mag,1) ./ mag;
     else
-        p = [9; (9 .* (10 .^ ((2:mag-1).' - 1)))] ./ lim;
-        p(end + 1) = 1 - sum(p);
+        p_sam = [9; (9 .* (10 .^ ((2:mag-1).' - 1)))] ./ lim;
+        p_sam(end+1) = 1 - sum(p_sam);
     end
-
-    idx = 1;
+    
+    p_tab_len = numel(num2str(lim)) - 1;
+    p_tab = NaN(10,p_tab_len);
+    
+    for i = 1:p_tab_len
+        p_dgt = i + 1;
+        p_ran = (10 ^ (p_dgt - 2)):((10 ^ (p_dgt - 1)) - 1);
+        p_tab(:,i) = arrayfun(@(d) sum(log10(1 + (1 ./ ((10 .* p_ran) + d)))),0:9).';
+    end
+    
+    k = 1;
     stop = false(x_len,1);
 
     while (~all(stop))
-        idx_true = ~stop & (((x .* 10) >= lim) | (rand(x_len,1) < p(idx)));
-        stop(idx_true) = true;
+        stop(~stop & (((x .* 10) > lim) | (rand(x_len,1) < p_sam(k)))) = true;
+        x(~stop) = arrayfun(@(n) add_digit(n,lim,p_tab),x(~stop));
 
-        idx_false = ~idx_true;
-        x(idx_false) = arrayfun(@(n) add_digit(n,lim),x(idx_false));
-
-        idx = idx + 1;
+        k = k + 1;
     end
 
     sizes = num2cell(size);
@@ -76,12 +78,11 @@ function r = benford_random_internal(size,lim,mag,prob)
 
 end
 
-function x = add_digit(x,lim)
+function x = add_digit(x,lim,p_tab)
 
     while (true)
-        p_dgt = numel(num2str(x)) + 1;
-        p_ran = (10 ^ (p_dgt - 2)):((10 ^ (p_dgt - 1)) - 1);
-        p = arrayfun(@(d) sum(log10(1 + (1 ./ ((10 .* p_ran) + d)))),0:9).';
+        d = numel(num2str(x)) + 1;
+        p = p_tab(:,(d - 1));
 
         out = (x * 10) + datasample(0:9,1,'Weights',p);
 
