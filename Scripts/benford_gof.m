@@ -1,5 +1,5 @@
 % [INPUT]
-% bd   = An instance of the BenfordData class produced by the "benford_analyse" function.
+% bd   = An instance of the BenfordData class produced by the "benford_data" function.
 % test = A string representing the test to perform, its value can be one of the following:
 %         - AD for the Anderson-Darling test (Choulakian, 1994)
 %         - CV for the Cramer-von Mises test (Choulakian, 1994)
@@ -17,6 +17,7 @@
 %         - U2 for the Watson's U2 test (Choulakian, 1994)
 %         - X2 for the Pearson's X2 test (Pearson, 1900)
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the test (optional, default=0.05).
+% so   = A boolean indicating whether to perform the test on the second order data (optional, default=false).
 % sims = An integer representing the number of Monte Carlo simulations to perform (optional, default=10000).
 %        It should only be specified for the following tests that don't implement an asymptotic p-value computation: DC, DE, FR, J2.
 %
@@ -34,6 +35,7 @@ function [h0,stat,pval] = benford_gof(varargin)
         p.addRequired('bd',@(x)validateattributes(x,{'BenfordData'},{'scalar'}));
         p.addRequired('test',@(x)any(validatestring(x,{'AD','CV','DC','DE','FR','G2','J2','JD','JS','KS','KU','MA','T2','U2','X2'})));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
+        p.addOptional('so',false,@(x)validateattributes(x,{'logical'},{'scalar'}));
         p.addOptional('sims',10000,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',1000}));
     end
 
@@ -43,18 +45,19 @@ function [h0,stat,pval] = benford_gof(varargin)
     bd = res.bd;
     test = res.test;
     a = res.a;
+    so = res.so;
     sims = res.sims;
 
-    if ((nargin == 4) && ~any(strcmp(test,{'DC' 'DE' 'FR' 'J2'})))
+    if ((nargin == 5) && ~any(strcmp(test,{'DC' 'DE' 'FR' 'J2'})))
         error('The ''sims'' parameter should only be specified for tests based on Monte Carlo simulations (DC, DE, FR, J2).');
     end
 
     switch (nargout)
         case 1
-            h0 = benford_test_internal(bd,test,a,sims);
+            h0 = benford_test_internal(bd,test,a,so,sims);
     
         case 3
-            [h0,stat,pval] = benford_gof_internal(bd,test,a,sims);
+            [h0,stat,pval] = benford_gof_internal(bd,test,a,so,sims);
 
         otherwise
             error('Only 1 or 3 output arguments can be specified.');
@@ -62,53 +65,59 @@ function [h0,stat,pval] = benford_gof(varargin)
 
 end
 
-function [h0,stat,pval] = benford_gof_internal(bd,test,a,sims)
+function [h0,stat,pval] = benford_gof_internal(bd,test,a,so,sims)
+
+    if (so)
+        tab = bd.SecondOrderTable;
+    else
+        tab = bd.FirstOrderTable;
+    end
 
     switch (test)
         case 'AD'
-            [stat_int,pval_int] = calculate_ad(bd.Table);
+            [stat_int,pval_int] = calculate_ad(tab);
         
         case 'CV'
-            [stat_int,pval_int] = calculate_cv(bd.Table);
+            [stat_int,pval_int] = calculate_cv(tab);
         
         case 'DC'
-            [stat_int,pval_int] = calculate_dc(bd.Table,sims);
+            [stat_int,pval_int] = calculate_dc(tab,sims);
 
         case 'DE'
-            [stat_int,pval_int] = calculate_de(bd.Table,sims);
+            [stat_int,pval_int] = calculate_de(tab,sims);
         
         case 'FR'
-            [stat_int,pval_int] = calculate_fr(bd.Table,sims);
+            [stat_int,pval_int] = calculate_fr(tab,sims);
 
         case 'G2'
-            [stat_int,pval_int] = calculate_g2(bd.Table);
+            [stat_int,pval_int] = calculate_g2(tab);
 
         case 'J2'
-            [stat_int,pval_int] = calculate_j2(bd.Table,sims);
+            [stat_int,pval_int] = calculate_j2(tab,sims);
 
         case 'JD'
-            [stat_int,pval_int] = calculate_jd(bd.Table);
+            [stat_int,pval_int] = calculate_jd(tab);
             
         case 'JS'
-            [stat_int,pval_int] = calculate_js(bd.Table);
+            [stat_int,pval_int] = calculate_js(tab);
             
         case 'KS'
-            [stat_int,pval_int] = calculate_ks(bd.Table);
+            [stat_int,pval_int] = calculate_ks(tab);
 
         case 'KU'
-            [stat_int,pval_int] = calculate_ku(bd.Table);
+            [stat_int,pval_int] = calculate_ku(tab);
 
         case 'MA'
             [stat_int,pval_int] = calculate_ma(bd.Sample);
 
         case 'T2'
-            [stat_int,pval_int] = calculate_t2(bd.Table);
+            [stat_int,pval_int] = calculate_t2(tab);
 
         case 'U2'
-            [stat_int,pval_int] = calculate_u2(bd.Table);
+            [stat_int,pval_int] = calculate_u2(tab);
 
         case 'X2'
-            [stat_int,pval_int] = calculate_x2(bd.Table);
+            [stat_int,pval_int] = calculate_x2(tab);
     end
 
     h0 = pval_int >= a;
@@ -123,7 +132,7 @@ end
 function [stat,pval] = calculate_ad(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_f = tab.EmpF;
     the_f = tab.TheF;
@@ -168,7 +177,7 @@ end
 function [stat,pval] = calculate_cv(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_f = tab.EmpF;
     the_f = tab.TheF;
@@ -209,7 +218,7 @@ end
 function [stat,pval] = calculate_dc(tab,sims)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
     adj = sqrt(n);
 
     emp_p = tab.EmpP;
@@ -232,7 +241,7 @@ end
 function [stat,pval] = calculate_de(tab,sims)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
     adj = sqrt(n);
 
     emp_p = tab.EmpP;
@@ -255,7 +264,7 @@ end
 function [stat,pval] = calculate_fr(tab,sims)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
     adj = n / (k ^ 2);
 
     emp_p = tab.EmpP;
@@ -281,7 +290,7 @@ end
 function [stat,pval] = calculate_g2(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_p = tab.EmpP;
     the_p = tab.TheP;
@@ -295,7 +304,7 @@ end
 function [stat,pval] = calculate_j2(tab,sims)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_p = tab.EmpP;
     the_f = tab.TheF;
@@ -320,7 +329,7 @@ end
 function [stat,pval] = calculate_jd(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_p = tab.EmpP;
     the_p = tab.TheP;
@@ -331,13 +340,8 @@ function [stat,pval] = calculate_jd(tab)
     [v,d] = eig(cm,'balance','vector');
     [d,idx_sort] = sort(real(d),1,'descend');
     v = v(:,idx_sort);
-
-    idx_tol = abs(d) >= 1e-15;
-
-    if (sum(idx_tol) == 0)
-        idx_tol = d >= mean(d);
-    end
-
+    
+	idx_tol = d >= mean(d);
     d_tol = d(idx_tol);
     v_tol = v(:,idx_tol);
 
@@ -359,7 +363,7 @@ function [stat,pval] = calculate_js(tab)
 
     dgts = tab.Digits;
     dgts_max = dgts(end);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
     
     emp_p = tab.EmpP;
     emp_mu = sum(dgts .* emp_p);
@@ -380,7 +384,7 @@ end
 
 function [stat,pval] = calculate_ks(tab)
 
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_f = tab.EmpF;
     the_f = tab.TheF;
@@ -393,7 +397,7 @@ end
 
 function [stat,pval] = calculate_ku(tab)
 
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_f = tab.EmpF;
     the_f = tab.TheF;
@@ -424,7 +428,7 @@ end
 function [stat,pval] = calculate_t2(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_p = tab.EmpP;
     the_p = tab.TheP;
@@ -438,7 +442,7 @@ end
 function [stat,pval] = calculate_u2(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_f = tab.EmpF;
     the_f = tab.TheF;
@@ -483,7 +487,7 @@ end
 function [stat,pval] = calculate_x2(tab)
 
     k = height(tab);
-    n = sum(tab.Count);
+    n = sum(tab.Amount);
 
     emp_p = tab.EmpP;
     the_p = tab.TheP;
