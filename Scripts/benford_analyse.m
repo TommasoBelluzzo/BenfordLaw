@@ -24,22 +24,26 @@ end
 
 function benford_analyse_internal(data,a)
 
-    %bd1 = benford_data(data,1);
 
-    bd2 = benford_data(data,2);
-    [bd2_gof_fo,bd2_gof_so] = all_gofs(bd2,a);
+    bd2 = benford_data(data,1);
+    [mant_test,mant_desc] = benford_mantissae(bd2,a);
+    [res_fo,res_so] = all_gofs(bd2,a);
     
-    %bd3 = benford_data(data,3);
+    z = norminv(1 - (a / 2));
+    s = bd2.FirstOrderTable.TheP .* (1 - bd2.FirstOrderTable.TheP);
+    k = s ./ 9;
+    
+    intval = mean(bd2.FirstOrderTable.TheP) - (z .* (std(bd2.FirstOrderTable.TheP) ./ sqrt(1:9).'));
 
 end
 
 function [res_fo,res_so] = all_gofs(bd,a)
 
-    gofs = {'AD' 'CV' 'DC' 'DE' 'FR' 'G2' 'J2' 'JD' 'JS' 'KS' 'KU' 'MA' 'T2' 'U2' 'X2'};
+    gofs = {'AD' 'CV' 'DC' 'DE' 'FR' 'G2' 'J2' 'JD' 'JS' 'KS' 'KU' 'T2' 'U2' 'X2'};
     gofs_len = numel(gofs);
     
-    res_fo = cell2table(cell(gofs_len,3),'RowNames',gofs,'VariableNames',{'H0' 'Stat' 'P'});
-    res_so = cell2table(cell(gofs_len,3),'RowNames',gofs,'VariableNames',{'H0' 'Stat' 'P'});
+    res_fo = cell2table(cell(gofs_len,3),'RowNames',gofs,'VariableNames',{'H0' 'Stat' 'PValue'});
+    res_so = cell2table(cell(gofs_len,3),'RowNames',gofs,'VariableNames',{'H0' 'Stat' 'PValue'});
     res_off = 1;
     
     for i = 1:gofs_len
@@ -51,5 +55,8 @@ function [res_fo,res_so] = all_gofs(bd,a)
 
         res_off = res_off + 1;
     end
+    
+    res_fo.H0 = logical(res_fo.H0);
+    res_so.H0 = logical(res_so.H0);
 
 end

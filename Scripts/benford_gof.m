@@ -12,7 +12,6 @@
 %         - JS for the Judge-Schechter Mean Deviation test (Judge & Schechter, 2009)
 %         - KS for the Kolmogorov-Smirnov test (Kolomonorgov, 1933)
 %         - KU for the Kuiper test (Kuiper, 1960)
-%         - MA for the Mantissa Arc test (Alexander, 2009)
 %         - T2 for the Freeman-Tukey T2 test (Freeman & Tukey, 1950)
 %         - U2 for the Watson's U2 test (Choulakian, 1994)
 %         - X2 for the Pearson's X2 test (Pearson, 1900)
@@ -33,7 +32,7 @@ function [h0,stat,pval] = benford_gof(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('bd',@(x)validateattributes(x,{'BenfordData'},{'scalar'}));
-        p.addRequired('test',@(x)any(validatestring(x,{'AD','CV','DC','DE','FR','G2','J2','JD','JS','KS','KU','MA','T2','U2','X2'})));
+        p.addRequired('test',@(x)any(validatestring(x,{'AD','CV','DC','DE','FR','G2','J2','JD','JS','KS','KU','T2','U2','X2'})));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
         p.addOptional('so',false,@(x)validateattributes(x,{'logical'},{'scalar'}));
         p.addOptional('sims',10000,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',1000}));
@@ -106,9 +105,6 @@ function [h0,stat,pval] = benford_gof_internal(bd,test,a,so,sims)
 
         case 'KU'
             [stat_int,pval_int] = calculate_ku(tab);
-
-        case 'MA'
-            [stat_int,pval_int] = calculate_ma(bd.Sample);
 
         case 'T2'
             [stat_int,pval_int] = calculate_t2(tab);
@@ -405,23 +401,6 @@ function [stat,pval] = calculate_ku(tab)
     stat = (sqrt(n) + 0.155 + (0.240 / sqrt(n))) * (max(emp_f - the_f) + max(the_f - emp_f));
 
     pval = ((8 * (stat ^ 2)) - 2) * exp(-2 * (stat ^ 2));
-
-end
-
-function [stat,pval] = calculate_ma(sam)
-
-    n = numel(sam);
-
-    l = log10(sam);
-    l(l < 0) = l(l < 0) + abs(ceil(l(l < 0))) + 1;
-
-    mant = l - (l - rem(l,1));
-    x = cos(2 .* pi() .* mant);
-    y = sin(2 .* pi() .* mant);
-
-    stat = (mean(x) ^ 2) + (mean(y) ^ 2);
-
-    pval = exp(-stat * n);
 
 end
 
