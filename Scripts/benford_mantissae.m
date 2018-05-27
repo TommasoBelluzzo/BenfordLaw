@@ -3,11 +3,11 @@
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the test (optional, default=0.05).
 %
 % [OUTPUT]
-% test = a 1-by-3 table containing the Mantissae Arc test result. It contains the following columns:
+% test = A 1-by-3 table containing the Mantissae Arc test result. It has the following columns:
 %         > H0: a boolean indicating whether the null hypothesis is accepted (true) or rejected (false).
 %         > Statistic: a float representing the statistic value.
 %         > pValue: s float representing the p-value associated to the statistic.
-% desc = a 4-by-2 table containing the theoretical and empirical descriptive statistics. It contains the following columns:
+% desc = A 4-by-2 table containing the theoretical and empirical descriptive statistics. It has the following columns:
 %         > The: the theoretical mean, variance, skewness and kurtosis.
 %         > The: the empirical mean, variance, skewness and kurtosis.
 
@@ -55,7 +55,7 @@ function [test,desc] = benford_mantissae_internal(bd,a)
     test.Properties.VariableNames = {'H0' 'Statistic' 'pValue'};
     
     if (nargout == 2)
-        desc = table([0.5; 0.08333; 0; -1.2],[round(mean(mant),5); round(var(mant),5); round(skewness(mant,true),5); round(kurtosis(mant,true),5)]);
+        desc = table([0.5; 0.08333; 0; -1.2],[mean(mant); var(mant); skewness(mant,true); kurtosis(mant,true)]);
         desc.Properties.RowNames = {'Mean' 'Variance' 'Skewness' 'Kurtosis'};
         desc.Properties.VariableNames = {'The' 'Emp'};
     end

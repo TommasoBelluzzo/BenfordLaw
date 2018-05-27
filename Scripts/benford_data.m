@@ -5,11 +5,11 @@
 %
 % [OUTPUT]
 % bd   = An instance of the BenfordData class that exposes the following properties:
-%         - Digits: the number of first significant digits analysed.
-%         - Sample: a vector containing the original valid observations.
-%         - FirstOrderData: a vector containing the first order sample.
-%         - FirstOrderDigits: a vector containing the first significant digits of the first order sample.
-%         - FirstOrderTable: a n-by-7 table containing the first order test data. It contains the following columns:
+%         - Digits = The number of first significant digits analysed.
+%         - Sample = A vector containing the original valid observations.
+%         - FirstOrderData = A vector containing the first order sample.
+%         - FirstOrderDigits = A vector containing the first significant digits of the first order sample.
+%         - FirstOrderTable = A n-by-7 table containing the first order test data. It has the following columns:
 %            > Digits: the ordered sequence of the first significant digits.
 %            > Amount: the number of occurrences of each first significant digit.
 %            > TheP: the theoretical frequency of each first significant digit.
@@ -17,9 +17,9 @@
 %            > TheF: the theoretical cumulative frequency of the first significant digits.
 %            > EmpF: the empirical cumulative frequency of the first significant digits.
 %            > Z: the Z-score of each first significant digit.
-%         - SecondOrderData: a vector containing the second order sample.
-%         - SecondOrderDigits: a vector containing the first significant digits of the second order sample.
-%         - SecondOrderTable: a n-by-7 table containing the second order test data. It contains the following columns:
+%         - SecondOrderData = A vector containing the second order sample.
+%         - SecondOrderDigits = A vector containing the first significant digits of the second order sample.
+%         - SecondOrderTable = A n-by-7 table containing the second order test data. It has the following columns:
 %            > Digits: the ordered sequence of the first significant digits.
 %            > Amount: the number of occurrences of each first significant digit.
 %            > TheP: the theoretical frequency of each first significant digit.
@@ -27,8 +27,8 @@
 %            > TheF: the theoretical cumulative frequency of the first significant digits.
 %            > EmpF: the empirical cumulative frequency of the first significant digits.
 %            > Z: the Z-score of each first significant digit.
-%         - Mantissae: a vector containing the mantissae of the original valid observations.
-%         - Summation: a n-by-7 table containing the summation test data. It contains the following columns:
+%         - Mantissae = A vector containing the mantissae of the original valid observations.
+%         - Summation = A n-by-7 table containing the summation test data. It has the following columns:
 %            > Digits: the ordered sequence of the first significant digits.
 %            > Amount: the sum of the sample values grouped by their respective first significant digits.
 %            > TheP: the theoretical frequency of each sum.
