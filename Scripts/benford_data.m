@@ -1,5 +1,5 @@
 % [INPUT]
-% data = A numeric array representing the sample on which the Benford's Law analysis must be performed.
+% data = A numeric array representing the sample on which the Benford's Law Analysis must be performed.
 % d    = An integer [1,3] representing the number of first significant digits to analyse.
 % ccf  = A boolean indicating whether to apply a continuity correction factor on Z-scores (optional, default=true).
 %
@@ -27,7 +27,6 @@
 %            > TheF: the theoretical cumulative frequency of the first significant digits.
 %            > EmpF: the empirical cumulative frequency of the first significant digits.
 %            > Z: the Z-score of each first significant digit.
-%         - Mantissae = A vector containing the mantissae of the original valid observations.
 %         - Summation = A n-by-7 table containing the summation test data. It has the following columns:
 %            > Digits: the ordered sequence of the first significant digits.
 %            > Amount: the sum of the sample values grouped by their respective first significant digits.

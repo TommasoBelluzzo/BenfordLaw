@@ -1,5 +1,5 @@
 % [INPUT]
-% size = A vector of integers in which each element represents the size of a dimension of the output (optional, default=1);
+% size = A vector of integers in which each element represents the size of a dimension of the output (optional, default=[1 1]);
 % lim  = An integer, greater than or equal to 9, representing the maximum possible value to be generated (optional, default=9).
 % prob = A string representing the method to use for distributing generated values over the whole range (optional, default='VAL').
 %        Its value can be one of the following:
@@ -7,7 +7,7 @@
 %         - VAL (each value has the same probability)
 %
 % [OUTPUT]
-% r    = An array of Benford's Law conforming random numbers.
+% r    = An numeric array, shaped as per "size" input parameter, of Benford's Law conforming random numbers.
 
 function r = benford_random(varargin)
 
@@ -83,7 +83,6 @@ function x = add_digit(x,lim,p_tab)
     while (true)
         d = numel(num2str(x)) + 1;
         p = p_tab(:,(d - 1));
-
         out = (x * 10) + datasample(0:9,1,'Weights',p);
 
         if (out <= lim)

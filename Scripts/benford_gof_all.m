@@ -5,7 +5,7 @@
 % sims = An integer representing the number of Monte Carlo simulations to perform (optional, default=10000).
 %
 % [OUTPUT]
-% gofs = A 14-by-3 table containing the goodness-of-fit test results. It has the following columns:
+% gofs = A 14-by-3 table containing the goodness-of-fit test results, with the following columns:
 %         > H0: booleans indicating whether the null hypothesis of each test is accepted (true) or rejected (false).
 %         > Statistic: the value of each statistic.
 %         > pValue: the p-value associated to each statistic.
