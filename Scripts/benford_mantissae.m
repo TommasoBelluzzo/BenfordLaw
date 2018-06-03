@@ -1,11 +1,14 @@
 % [INPUT]
 % data = A numeric array of n elements representing the sample on which the Mantissae Analysis must be performed.
+% a    = A float [0.01,0.10] representing the statistical significance threshold for the Mantissae Arc test (optional, default=0.05).
 % ran  = A string representing the range of values to consider (optional, default='ALL').
 %        Its value can be one of the following:
 %         - ALL (all values)
 %         - NEG (only negative values)
 %         - POS (only positive values)
-% a    = A float [0.01,0.10] representing the statistical significance threshold for the Mantissae Arc test (optional, default=0.05).
+% dec  = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+% btv  = A boolean indicating whether to perform data transformation and validation (optional, default=true).
+%        This input argument should be set to false only when data has already been transformed and validated by another function.
 %
 % [OUTPUT]
 % mant = An n-by-3 table containing the analyzed components, with the following columns:
@@ -27,36 +30,23 @@ function [mant,test,desc] = benford_mantissae(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('data',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
-        p.addOptional('ran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
+        p.addOptional('ran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
+        p.addOptional('dec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
+        p.addOptional('btv',true,@(x)validateattributes(x,{'logical'},{'scalar'}));
     end
 
     p.parse(varargin{:});
 
     res = p.Results;
     data = res.data;
-    ran = res.ran;
     a = res.a;
-    
-    data = double(data(:));
-    
-    switch (ran)
-        case 'NEG'
-            data = abs(data(isfinite(data) & (data < 0)));
-    
-        case 'POS'
-            data = data(isfinite(data) & (data > 0));
-            
-        otherwise
-            data = abs(data(isfinite(data) & (data ~= 0)));
-    end
+    ran = res.ran;
+    dec = res.dec;
+    btv = res.btv;
 
-    if (numel(unique(data)) < 10)
-        error('The number of unique valid observations in the sample must be greater than or equal to 10.');
-    end
-    
-    if (numel(data) < 250)
-        warning('A minimum sample size of 250 valid observations is recommended in order to produce a coherent analysis.');
+    if (btv)
+        data = benford_data(data,ran,dec);
     end
 
     switch (nargout)
@@ -77,8 +67,6 @@ end
 
 function [mant,test,desc] = benford_mantissae_internal(data,a)
 
-    data = abs(data);
-    
     l = log10(data);
     
     neg_idx = l < 0;
