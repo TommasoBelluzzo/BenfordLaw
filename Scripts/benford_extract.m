@@ -32,8 +32,13 @@
 %         - EmpF: the empirical cumulative frequency of the significant digits.
 %         - Z: the Z-score of each significant digit.
 %         - ZTest: the Z-score test result of each significant digit.
+% mad  = A 4-by-3 table containing the Mean Absolute Deviation test result, with the following columns:
+%         - Conformity: a vector of strings representing the conformity level.
+%         - Threshold: a vector of floats representing the conformity thresholds.
+%         - MAD: a vector containing 3 NaN values and a float. The float represents the MAD value of the sample.
+%                Its row offset corresponds to its respective conformity level.
 
-function [tab,test] = benford_extract(varargin)
+function [tab,mad] = benford_extract(varargin)
 
     persistent p;
 
@@ -68,7 +73,7 @@ function [tab,test] = benford_extract(varargin)
             tab = benford_extract_internal(data,extr,a,ccf);
 
         case 2
-            [tab,test] = benford_extract_internal(data,extr,a,ccf);
+            [tab,mad] = benford_extract_internal(data,extr,a,ccf);
             
         otherwise
             error('Only up to 2 output arguments can be specified.');
@@ -76,7 +81,7 @@ function [tab,test] = benford_extract(varargin)
 
 end
 
-function [tab,test] = benford_extract_internal(data,extr,a,ccf)
+function [tab,mad] = benford_extract_internal(data,extr,a,ccf)
 
     switch (extr)
         case '1ST'
@@ -137,66 +142,13 @@ function [tab,test] = benford_extract_internal(data,extr,a,ccf)
     tab.Properties.VariableNames = {'Digits' 'ThePL' 'TheP' 'ThePU' 'TheF' 'EmpC' 'EmpP' 'EmpF' 'Z' 'ZTest'};
 
     if (nargout == 2)
-        mad = mean(diff_p_abs);
+        mad_val = mean(diff_p_abs);
+        mad_thr = [0.008; 0.016; 0.024; Inf];
+        mad_idx = find(mad_thr > mad_val,1);
+        mad_res = [NaN((mad_idx - 1),1); mad_val; NaN((4 - mad_idx),1)];
         
-        switch (extr)
-            case '1ST'
-                if (mad <= 0.006)
-                    mad_conf = 'Close Conformity';
-                elseif (mad <= 0.012)
-                    mad_conf = 'Acceptable Conformity';
-                elseif (mad <= 0.015)
-                    mad_conf = 'Marginally Acceptable Conformity';
-                else
-                    mad_conf = 'Nonconformity';
-                end
-
-            case '2ND'
-                if (mad <= 0.008)
-                    mad_conf = 'Close Conformity';
-                elseif (mad <= 0.010)
-                    mad_conf = 'Acceptable Conformity';
-                elseif (mad <= 0.012)
-                    mad_conf = 'Marginally Acceptable Conformity';
-                else
-                    mad_conf = 'Nonconformity';
-                end
-
-            case '3RD'
-                mad_conf = 'N/A';
-
-            case 'F2D'
-                if (mad <= 0.0012)
-                    mad_conf = 'Close Conformity';
-                elseif (mad <= 0.0018)
-                    mad_conf = 'Acceptable Conformity';
-                elseif (mad <= 0.0022)
-                    mad_conf = 'Marginally Acceptable Conformity';
-                else
-                    mad_conf = 'Nonconformity';
-                end
-
-            case 'F3D'
-                if (mad <= 0.00036)
-                    mad_conf = 'Close Conformity';
-                elseif (mad <= 0.00044)
-                    mad_conf = 'Acceptable Conformity';
-                elseif (mad <= 0.00050)
-                    mad_conf = 'Marginally Acceptable Conformity';
-                else
-                    mad_conf = 'Nonconformity';
-                end
-
-            case 'L2D'
-                mad_conf = 'N/A';
-        end
-
-        mse = mean(diff_p_abs .^ 2);
-        mse_conf = 'N/A';
-        
-        test = table([mad; mse],[{mad_conf}; {mse_conf}]);
-        test.Properties.RowNames = {'MAD' 'MSE'};
-        test.Properties.VariableNames = {'Value' 'Conformity'};
+        mad = table({'Close Conformity'; 'Acceptable Conformity'; 'Marginally Acceptable Conformity'; 'Nonconformity'},mad_thr,mad_res);
+        mad.Properties.VariableNames = {'Conformity' 'Threshold' 'MAD'};
     end
 
 end
