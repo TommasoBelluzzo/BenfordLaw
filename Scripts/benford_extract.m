@@ -6,6 +6,7 @@
 %         - NEG (only negative values)
 %         - POS (only positive values)
 % ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+%        No rounding is performed, the exceeding decimals are truncated as if they were not present.
 % extr = A string representing the digits extraction to perform (optional, default='1ST').
 %        Its value can be one of the following:
 %         - 1ST (first digit extraction)

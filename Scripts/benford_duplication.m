@@ -1,65 +1,104 @@
 % [INPUT]
-% data = A numeric array of n elements representing the sample on which the Duplication Analysis must be performed.
+% data = A numeric array of n elements representing the sample on which the Number Duplication Analysis must be performed.
+% ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+%        No rounding is performed, the exceeding decimals are truncated as if they were not present.
 %
 % [OUTPUT]
-% df   = A 1-by-5 table containing the Distortion Factor test result, with the following columns:
-%         > AM: a float representing the actual mean of the collapsed values.
-%         > EM: a float representing the expected mean of the collapsed values.
-%         > Value: a float representing the distortion factor.
-%         > pValue: a float representing the p-value associated to the distortion factor.
-%         > Significance: a boolean indicating whether the test is significant (true) or not (false) for the given confidence level.
-% coll = A numeric vector representing the collapsed values of the sample.
+% d10n = 
+% d0n  = 
+% d0p  = 
+% d10p = 
+% z    = 
 
-function [d10n,d0n,d0p,d10p] = benford_duplication(varargin)
+function [d10n,d0n,d0p,d10p,z] = benford_duplication(varargin)
 
     persistent p;
 
     if (isempty(p))
         p = inputParser();
         p.addRequired('data',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
+        p.addOptional('ddec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
     end
 
     p.parse(varargin{:});
 
     res = p.Results;
     data = res.data;
-    
-    if (nargout ~= 4)
-        error('Only 4 output arguments can be specified.');
+    ddec = res.ddec;
+
+    if (nargout ~= 5)
+        error('Only 5 output arguments can be specified.');
     end
 
-    [d10n,d0n,d0p,d10p] = benford_duplication_internal(data);
+    [d10n,d0n,d0p,d10p,z] = benford_duplication_internal(data,ddec);
 
 end
 
-function [d10n,d0n,d0p,d10p] = benford_duplication_internal(data)
+function [d10n,d0n,d0p,d10p,z] = benford_duplication_internal(data,ddec)
+
+    data = double(data(:));
+    data = floor(data .* (10 ^ ddec)) ./ (10 ^ ddec);
 
     data_10n = data(data <= -10);
 
-    if (numel(data_10n) > 0)
-        data_10n_uni = unique(data_10n);
-        [a,b] = histcounts(data_10n,data_10n_uni);
+    if (numel(data_10n) > 1)
+        [uni,~,uni_idx] = unique(data_10n);
+        c = accumarray(uni_idx,1);
+
+        d10n = table(uni,c);
+        d10n.Properties.VariableNames = {'Value' 'Count'};
+        
+        d10n(d10n.Count < 2,:) = [];
+        d10n = sortrows(d10n,[-2 1]);
+    else
+        d10n = table(zeros(0,1),zeros(0,1),'VariableNames',{'Value' 'Count'});
     end
 
     data_0n = data((data > -10) & (data < 0));
     
-    if (numel(data_0n) > 0)
-        data_0n_uni = unique(data_0n);
-        [a,b] = histcounts(data_0n,data_0n_uni);
+    if (numel(data_0n) > 1)
+        [uni,~,uni_idx] = unique(data_0n);
+        c = accumarray(uni_idx,1);
+
+        d0n = table(uni,c);
+        d0n.Properties.VariableNames = {'Value' 'Count'};
+        
+        d0n(d0n.Count < 2,:) = [];
+        d0n = sortrows(d0n,[-2 1]);
+    else
+        d0n = table(zeros(0,1),zeros(0,1),'VariableNames',{'Value' 'Count'});
     end
 
     data_0p = data((data > 0) & (data < 10));
     
-    if (numel(data_0p) > 0)
-        data_0p = sort(data_0p);
+    if (numel(data_0p) > 1)
+        [uni,~,uni_idx] = unique(data_0p);
+        c = accumarray(uni_idx,1);
 
+        d0p = table(uni,c);
+        d0p.Properties.VariableNames = {'Value' 'Count'};
+        
+        d0p(d0p.Count < 2,:) = [];
+        d0p = sortrows(d0p,[-2 -1]);
+    else
+        d0p = table(zeros(0,1),zeros(0,1),'VariableNames',{'Value' 'Count'});
     end
 
     data_10p = data(data >= 10);
     
-    if (numel(data_10p) > 0)
-        [unique_values, ~, labels] = unique(data_10p);
-        counts = accumarray(labels, 1);
+    if (numel(data_10p) > 1)
+        [uni,~,uni_idx] = unique(data_10p);
+        c = accumarray(uni_idx,1);
+
+        d10p = table(uni,c);
+        d10p.Properties.VariableNames = {'Value' 'Count'};
+        
+        d10p(d10p.Count < 2,:) = [];
+        d10p = sortrows(d10p,[-2 -1]);
+    else
+        d10p = table(zeros(0,1),zeros(0,1),'VariableNames',{'Value' 'Count'});
     end
+    
+    z = sum(data == 0);
 
 end

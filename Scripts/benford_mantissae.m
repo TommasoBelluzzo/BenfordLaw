@@ -6,6 +6,7 @@
 %         - NEG (only negative values)
 %         - POS (only positive values)
 % ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+%        No rounding is performed, the exceeding decimals are truncated as if they were not present.
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the Mantissae Arc test (optional, default=0.05).
 % btv  = A boolean indicating whether to perform data transformation and validation (optional, default=true).
 %        This input argument should be set to false only when data has already been transformed and validated by another function.
@@ -84,7 +85,10 @@ function [mant,test,desc] = benford_mantissae_internal(data,a)
 
     if (nargout >= 2)
         stat = (mean(x) ^ 2) + (mean(y) ^ 2);
+
         pval = 1 - exp(-stat * numel(m));
+        pval = max([0 min([pval 1])]);
+
         h0 = pval >= a;
 
         test = table(h0,stat,pval);

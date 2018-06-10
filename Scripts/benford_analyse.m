@@ -6,6 +6,7 @@
 %         - NEG (only negative values)
 %         - POS (only positive values)
 % ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+%        No rounding is performed, the exceeding decimals are truncated as if they were not present.
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the tests (optional, default=0.05).
 % ccf  = A boolean indicating whether to apply a continuity correction factor on Z-scores (optional, default=true).
 
@@ -58,12 +59,13 @@ function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
 %     res_l2d = benford_extract(data,dran,ddec,'L2D',a,ccf,false);
 %     gof_l2d = benford_gof_all(res_l2d,a);
 
-    [d10n,d0n,d0p,d10p] = benford_duplication(data_orig);
+	[d10n,d0n,d0p,d10p,z] = benford_duplication(data_orig,ddec);
+    plot_duplication(d10n,d0n,d0p,d10p,z,ddec);
 
-%     [mant,mant_test,mant_desc] = benford_mantissae(data,dran,ddec,a,false);
-%     plot_mantissae(mant,mant_test,mant_desc,a);
+    [mant,mant_test,mant_desc] = benford_mantissae(data,dran,ddec,a,false);
+    plot_mantissae(mant,mant_test,mant_desc,a);
 
-	[df,df_coll] = benford_df(data_orig);
+	[df,df_coll] = benford_df(data_orig,ddec,a);
     plot_df(df,df_coll,a);
 
 end
@@ -83,8 +85,6 @@ function plot_df(df,coll,a)
     else
         df_res = 'DF Test: No Distortion';
     end
-    
-    coll = round(coll,2);
 
     fig = figure();
     set(fig,'Name','Distortion Factor Model','Units','normalized','Position',[100 100 0.75 0.75]);
@@ -119,6 +119,114 @@ function plot_df(df,coll,a)
     set(l,'Box','off','Position',[((1 - l_pos(3)) / 2) 0.067 l_pos(3) l_pos(4)]);
 
     suptitle(sprintf('Distortion Factor Model (a=%.2f)\n%s',a,df_res));
+    movegui(fig,'center');
+
+end
+
+function plot_duplication(d10n,d0n,d0p,d10p,z,ddec)
+
+    d10n_h = height(d10n);
+    d0n_h = height(d0n);
+    d0p_h = height(d0p);
+    d10p_h = height(d10p);
+    dup = d10n_h + d0n_h + d0p_h + d10p_h;
+    fs = ['%.' num2str(ddec) 'f'];
+
+    fig = figure();
+    set(fig,'Name','Number Duplication Analysis','Units','normalized','Position',[100 100 0.75 0.75]);
+
+    if (d10p_h == 0)
+        sub_1 = subplot(13,9,[19 58],'Box','on');
+        line([0 1],[0 1],'Color','k','LineWidth',1.5);
+        hold on;
+            line([0 1],[1 0],'Color','k','LineWidth',1.5);
+        hold off;
+        set(sub_1,'Color',[0.941 0.941 0.941]);
+        set(sub_1,'XLim',[0 1],'XTick',[],'XTickLabel',[]);
+        set(sub_1,'YLim',[0 1],'YTick',[],'YTickLabel',[]);
+        title(sub_1,sprintf('Top 10 (X > 10) | No Duplicates'));
+    else
+        d10p_m = min([10 d10p_h]);
+        d10p_d = 10 - d10p_m;
+        c = [d10p.Count(1:d10p_m); NaN(d10p_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d10p.Value(1:d10p_m),'UniformOutput',false); repmat({'N\A'},d10p_d,1)];
+        
+        sub_1 = subplot(13,9,[19 58]);
+        barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
+        set(sub_1,'YLim',[0 11],'YTickLabel',flipud(v));
+        title(sub_1,sprintf('Top 10 (X > 10) | Duplicates: %d',d10p_h));
+    end
+
+    if (d0p_h == 0)
+        sub_2 = subplot(13,9,[24 63],'Box','on');
+        line([0 1],[0 1],'Color','k','LineWidth',1.5);
+        hold on;
+            line([0 1],[1 0],'Color','k','LineWidth',1.5);
+        hold off;
+        set(sub_2,'Color',[0.941 0.941 0.941]);
+        set(sub_2,'XLim',[0 1],'XTick',[],'XTickLabel',[]);
+        set(sub_2,'YLim',[0 1],'YTick',[],'YTickLabel',[]);
+        title(sub_2,sprintf('Top 10 (10 > X > 0) | No Duplicates'));
+    else
+        d0p_m = min([10 d0p_h]);
+        d0p_d = 10 - d0p_m;
+        c = [d0p.Count(1:d0p_m); NaN(d0p_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d0p.Value(1:d0p_m),'UniformOutput',false); repmat({'N\A'},d0p_d,1)];
+        
+        sub_2 = subplot(13,9,[24 63]);
+        barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
+        set(sub_2,'YLim',[0 11],'YTickLabel',flipud(v));
+        title(sub_2,sprintf('Top 10 (10 > X > 0) | Duplicates: %d',d0p_h));
+    end
+    
+    if (d10n_h == 0)
+        sub_3 = subplot(13,9,[73 112],'Box','on');
+        line([0 1],[0 1],'Color','k','LineWidth',1.5);
+        hold on;
+            line([0 1],[1 0],'Color','k','LineWidth',1.5);
+        hold off;
+        set(sub_3,'Color',[0.941 0.941 0.941]);
+        set(sub_3,'XLim',[0 1],'XTick',[],'XTickLabel',[]);
+        set(sub_3,'YLim',[0 1],'YTick',[],'YTickLabel',[]);
+        title(sub_3,sprintf('Top 10 (X < -10) | No Duplicates'));
+    else
+        d10n_m = min([10 d10n_h]);
+        d10n_d = 10 - d10p_m;
+        c = [d10n.Count(1:d10n_m); NaN(d10n_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d10n.Value(1:d10n_m),'UniformOutput',false); repmat({'N\A'},d10n_d,1)];
+        
+        sub_3 = subplot(13,9,[73 112]);
+        barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
+        set(sub_3,'YLim',[0 11],'YTickLabel',flipud(v));
+        title(sub_3,sprintf('Top 10 (X < -10) | Duplicates: %d',d10n_h));
+    end
+
+    if (d0n_h == 0)
+        sub_4 = subplot(13,9,[78 117],'Box','on');
+        line([0 1],[0 1],'Color','k','LineWidth',1.5);
+        hold on;
+            line([0 1],[1 0],'Color','k','LineWidth',1.5);
+        hold off;
+        set(sub_4,'Color',[0.941 0.941 0.941]);
+        set(sub_4,'XLim',[0 1],'XTick',[],'XTickLabel',[]);
+        set(sub_4,'YLim',[0 1],'YTick',[],'YTickLabel',[]);
+        title(sub_4,sprintf('Top 10 (0 > X > -10) | No Duplicates'));
+    else
+        d0n_m = min([10 d0n_h]);
+        d0n_d = 10 - d0n_m;
+        c = [d0n.Count(1:d0n_m); NaN(d0n_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d0n.Value(1:d0n_m),'UniformOutput',false); repmat({'N\A'},d0n_d,1)];
+        
+        sub_4 = subplot(13,9,[78 117]);
+        barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
+        set(sub_4,'YLim',[0 11],'YTickLabel',flipud(v));
+        title(sub_4,sprintf('Top 10 (0 > X > -10) | Duplicates: %d',d0n_h));
+    end
+
+    st = suptitle(sprintf('Number Duplication Analysis\nTotal Duplicates: %d\nTotal Zeros: %d',dup,z));
+    st_pos = get(st,'Position');
+    set(st,'Position',[st_pos(1) -0.08 st_pos(3)]);
+    
     movegui(fig,'center');
 
 end
@@ -171,7 +279,7 @@ function plot_mantissae(mant,test,desc,a)
     sub_3 = subplot(13,9,[55 103.5]);
     bar(hist_cent,hist_cnt,'hist');
     hold on;
-        line([0, 1],[hist_avg hist_avg],'Color','r','LineWidth',1.5);
+        line([0 1],[hist_avg hist_avg],'Color','r','LineWidth',1.5);
     hold off;
     set(sub_3,'XLim',[0 1]);
     title(sub_3,'Histogram');

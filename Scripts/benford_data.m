@@ -1,11 +1,12 @@
 % [INPUT]
 % data = A numeric array representing the sample to transform and validate.
-% ran  = A string representing the range of values to consider (optional, default='ALL').
+% dran = A string representing the range of values to consider (optional, default='ALL').
 %        Its value can be one of the following:
 %         - ALL (all values)
 %         - NEG (only negative values)
 %         - POS (only positive values)
-% dec  = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+% ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+%        No rounding is performed, the exceeding decimals are truncated as if they were not present.
 %
 % [OUTPUT]
 % data = A numeric vector representing the transformed and validated sample.
@@ -17,27 +18,27 @@ function data = benford_data(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('data',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
-        p.addOptional('ran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
-        p.addOptional('dec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
+        p.addOptional('dran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
+        p.addOptional('ddec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
     end
 
     p.parse(varargin{:});
 
     res = p.Results;
     data = res.data;
-    ran = res.ran;
-    dec = res.dec;
+    dran = res.dran;
+    ddec = res.ddec;
 
-    data = benford_data_internal(data,ran,dec);
+    data = benford_data_internal(data,dran,ddec);
 
 end
 
-function data = benford_data_internal(data,ran,dec)
+function data = benford_data_internal(data,dran,ddec)
 
     data = double(data(:));
-    data = round(data .* (10 ^ dec),0);
+    data = floor(data .* (10 ^ ddec));
     
-    switch (ran)
+    switch (dran)
         case 'NEG'
             data = abs(data(isfinite(data) & (data < 0)));
     

@@ -144,19 +144,22 @@ function [stat,pval] = calculate_ad(tab)
     fun_rho = @(u,lam) exp(sum(bsxfun(@(x,y) log(1 + ((x ^ 2) .* (y .^ 2))),u,lam),1) .* 0.25);
     fun_the = @(u,stat,lam) sum(bsxfun(@(x,y) 0.5 .* atan(x .* y),u,lam),1) - ((0.5 * stat) .* u);
     fun_int = @(u) sin(fun_the(u,stat,lam)) ./ (u .* fun_rho(u,lam));
+    
     pval = 0.5 + (integral(fun_int,0,Inf) / pi());
+    pval = max([0 min([pval 1])]);
     
     if (pval <= 0.001)
         a_x = stat / max(lam);
         a_v = sum(lam ~= 0);
         a = chi2pdf(a_x,a_v);
-        
+
         b_fun = @(x) (-x * stat) - (0.5 .* sum(log(1 - (2 .* x .* lam))));
         b_x0 = 1 / (4 * max(lam));
-        [~,b] = fminsearch(b_fun,b_x0);
+        [~,b] = fminsearch(b_fun,b_x0,optimset('Display','off'));
         b = exp(b);
 
         pval = min([a b]);
+        pval = max([0 min([pval 1])]);
     end
 
 end
@@ -185,7 +188,9 @@ function [stat,pval] = calculate_cv(tab)
     fun_rho = @(u,lam) exp(sum(bsxfun(@(x,y) log(1 + ((x ^ 2) .* (y .^ 2))),u,lam),1) .* 0.25);
     fun_the = @(u,stat,lam) sum(bsxfun(@(x,y) 0.5 .* atan(x .* y),u,lam),1) - ((0.5 * stat) .* u);
     fun_int = @(u) sin(fun_the(u,stat,lam)) ./ (u .* fun_rho(u,lam));
+    
     pval = 0.5 + (integral(fun_int,0,Inf) / pi());
+    pval = max([0 min([pval 1])]);
     
     if (pval <= 0.001)
         a_x = stat / max(lam);
@@ -194,10 +199,11 @@ function [stat,pval] = calculate_cv(tab)
         
         b_fun = @(x) (-x * stat) - (0.5 .* sum(log(1 - (2 .* x .* lam))));
         b_x0 = 1 / (4 * max(lam));
-        [~,b] = fminsearch(b_fun,b_x0);
+        [~,b] = fminsearch(b_fun,b_x0,optimset('Display','off'));
         b = exp(b);
 
         pval = min([a b]);
+        pval = max([0 min([pval 1])]);
     end
 
 end
@@ -222,6 +228,7 @@ function [stat,pval] = calculate_dc(tab,sims)
     stat = adj * max(abs(emp_p - the_p));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -245,6 +252,7 @@ function [stat,pval] = calculate_de(tab,sims)
     stat = adj * sqrt(sum((emp_p - the_p) .^ 2));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -271,6 +279,7 @@ function [stat,pval] = calculate_fr(tab,sims)
     stat = adj * ((sum(diff_f .^ 2) * k) - (sum(diff_f) ^ 2));
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -285,6 +294,7 @@ function [stat,pval] = calculate_g2(tab)
     stat = 2 * n * sum((emp_p .* log(emp_p + eps())) - (emp_p .* log(the_p + eps())));
     
     pval = 1 - chi2cdf(stat,(k - 1));
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -310,6 +320,7 @@ function [stat,pval] = calculate_j2(tab,sims)
     stat = sign(r) * (r ^ 2);
 
     pval = sum(h0 >= (stat - 1e-8)) / sims;
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -343,6 +354,7 @@ function [stat,pval] = calculate_jd(tab)
     end
 
     pval = 1 - chi2cdf(stat,numel(d_tol));
+    pval = max([0 min([pval 1])]);
  
 end
 
@@ -366,6 +378,7 @@ function [stat,pval] = calculate_js(tab)
     stat = abs(emp_mu - the_mu) / (dgts_max - the_mu);
 
     pval = (1 - cdf(norm,stat)) * 2;
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -379,6 +392,7 @@ function [stat,pval] = calculate_ks(tab)
     stat = (sqrt(n) + 0.120 + (0.110 / sqrt(n))) * max(abs(emp_f - the_f));
 
     pval = 2 * exp(-2 * (stat ^ 2));
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -392,6 +406,7 @@ function [stat,pval] = calculate_ku(tab)
     stat = (sqrt(n) + 0.155 + (0.240 / sqrt(n))) * (max(emp_f - the_f) + max(the_f - emp_f));
 
     pval = ((8 * (stat ^ 2)) - 2) * exp(-2 * (stat ^ 2));
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -406,6 +421,7 @@ function [stat,pval] = calculate_t2(tab)
     stat = n * sum((sqrt(emp_p) + sqrt(emp_p + 1) - sqrt((4 .* the_p) + 1)) .^ 2);
 
     pval = 1 - chi2cdf(stat,(k - 1));
+    pval = max([0 min([pval 1])]);
 
 end
 
@@ -437,7 +453,9 @@ function [stat,pval] = calculate_u2(tab)
     fun_rho = @(u,lam) exp(sum(bsxfun(@(x,y) log(1 + ((x ^ 2) .* (y .^ 2))),u,lam),1) .* 0.25);
     fun_the = @(u,stat,lam) sum(bsxfun(@(x,y) 0.5 .* atan(x .* y),u,lam),1) - ((0.5 * stat) .* u);
     fun_int = @(u) sin(fun_the(u,stat,lam)) ./ (u .* fun_rho(u,lam));
+    
     pval = 0.5 + (integral(fun_int,0,Inf) / pi());
+    pval = max([0 min([pval 1])]);
     
     if (pval <= 0.001)
         a_x = stat / max(lam);
@@ -446,10 +464,11 @@ function [stat,pval] = calculate_u2(tab)
         
         b_fun = @(x) (-x * stat) - (0.5 .* sum(log(1 - (2 .* x .* lam))));
         b_x0 = 1 / (4 * max(lam));
-        [~,b] = fminsearch(b_fun,b_x0);
+        [~,b] = fminsearch(b_fun,b_x0,optimset('Display','off'));
         b = exp(b);
 
         pval = min([a b]);
+        pval = max([0 min([pval 1])]);
     end
 
 end
@@ -465,6 +484,7 @@ function [stat,pval] = calculate_x2(tab)
     stat = n * sum(((emp_p - the_p) .^ 2) ./ the_p);
 
     pval = 1 - chi2cdf(stat,(k - 1));
+    pval = max([0 min([pval 1])]);
 
 end
 
