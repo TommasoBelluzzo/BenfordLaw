@@ -21,19 +21,19 @@
 %        This input argument should be set to false only when data has already been transformed and validated by another function.
 %
 % [OUTPUT]
-% tab = A variable height table containing the extraction data, with the following columns:
-%        - Digits: the ordered sequence of the significant digits.
-%        - ThePL: the lower confidence interval of the theoretical frequency.
-%        - TheP: the theoretical frequency of each significant digit.
-%        - ThePU: the upper confidence interval of the theoretical frequency.
-%        - TheF: the theoretical cumulative frequency of the significant digits.
-%        - EmpC: the number of occurrences of each significant digit in the sample.
-%        - EmpP: the empirical frequency of each significant digit.
-%        - EmpF: the empirical cumulative frequency of the significant digits.
-%        - Z: the Z-score of each significant digit.
-%        - ZTest: the Z-score test result of each significant digit.
+% tab  = A variable height table containing the extraction data, with the following columns:
+%         - Digits: the ordered sequence of the significant digits.
+%         - ThePL: the lower confidence interval of the theoretical frequency.
+%         - TheP: the theoretical frequency of each significant digit.
+%         - ThePU: the upper confidence interval of the theoretical frequency.
+%         - TheF: the theoretical cumulative frequency of the significant digits.
+%         - EmpC: the number of occurrences of each significant digit in the sample.
+%         - EmpP: the empirical frequency of each significant digit.
+%         - EmpF: the empirical cumulative frequency of the significant digits.
+%         - Z: the Z-score of each significant digit.
+%         - ZTest: the Z-score test result of each significant digit.
 
-function tab = benford_extract(varargin)
+function [tab,test] = benford_extract(varargin)
 
     persistent p;
 
@@ -63,11 +63,20 @@ function tab = benford_extract(varargin)
         data = benford_data(data,dran,ddec);
     end
 
-    tab = benford_extract_internal(data,extr,a,ccf);
+    switch (nargout)
+        case 1
+            tab = benford_extract_internal(data,extr,a,ccf);
+
+        case 2
+            [tab,test] = benford_extract_internal(data,extr,a,ccf);
+            
+        otherwise
+            error('Only up to 2 output arguments can be specified.');
+    end
 
 end
 
-function tab = benford_extract_internal(data,extr,a,ccf)
+function [tab,test] = benford_extract_internal(data,extr,a,ccf)
 
     switch (extr)
         case '1ST'
@@ -126,6 +135,69 @@ function tab = benford_extract_internal(data,extr,a,ccf)
 
     tab = table(the_dgts,the_p_lb,the_p,the_p_ub,the_f,emp_c,emp_p,emp_f,z,z_test);
     tab.Properties.VariableNames = {'Digits' 'ThePL' 'TheP' 'ThePU' 'TheF' 'EmpC' 'EmpP' 'EmpF' 'Z' 'ZTest'};
+
+    if (nargout == 2)
+        mad = mean(diff_p_abs);
+        
+        switch (extr)
+            case '1ST'
+                if (mad <= 0.006)
+                    mad_conf = 'Close Conformity';
+                elseif (mad <= 0.012)
+                    mad_conf = 'Acceptable Conformity';
+                elseif (mad <= 0.015)
+                    mad_conf = 'Marginally Acceptable Conformity';
+                else
+                    mad_conf = 'Nonconformity';
+                end
+
+            case '2ND'
+                if (mad <= 0.008)
+                    mad_conf = 'Close Conformity';
+                elseif (mad <= 0.010)
+                    mad_conf = 'Acceptable Conformity';
+                elseif (mad <= 0.012)
+                    mad_conf = 'Marginally Acceptable Conformity';
+                else
+                    mad_conf = 'Nonconformity';
+                end
+
+            case '3RD'
+                mad_conf = 'N/A';
+
+            case 'F2D'
+                if (mad <= 0.0012)
+                    mad_conf = 'Close Conformity';
+                elseif (mad <= 0.0018)
+                    mad_conf = 'Acceptable Conformity';
+                elseif (mad <= 0.0022)
+                    mad_conf = 'Marginally Acceptable Conformity';
+                else
+                    mad_conf = 'Nonconformity';
+                end
+
+            case 'F3D'
+                if (mad <= 0.00036)
+                    mad_conf = 'Close Conformity';
+                elseif (mad <= 0.00044)
+                    mad_conf = 'Acceptable Conformity';
+                elseif (mad <= 0.00050)
+                    mad_conf = 'Marginally Acceptable Conformity';
+                else
+                    mad_conf = 'Nonconformity';
+                end
+
+            case 'L2D'
+                mad_conf = 'N/A';
+        end
+
+        mse = mean(diff_p_abs .^ 2);
+        mse_conf = 'N/A';
+        
+        test = table([mad; mse],[{mad_conf}; {mse_conf}]);
+        test.Properties.RowNames = {'MAD' 'MSE'};
+        test.Properties.VariableNames = {'Value' 'Conformity'};
+    end
 
 end
 

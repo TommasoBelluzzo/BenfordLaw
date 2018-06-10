@@ -4,11 +4,19 @@
 %        No rounding is performed, the exceeding decimals are truncated as if they were not present.
 %
 % [OUTPUT]
-% d10n = 
-% d0n  = 
-% d0p  = 
-% d10p = 
-% z    = 
+% d10n = A variable height table containing the duplicates less than or equal to -10, with the following columns:
+%         - Value: the duplicate values.
+%         - Count: the number of occurrences of the duplicate values.
+% d1n  = A variable height table containing the duplicates between -10 and 0 (exclusive), with the following columns:
+%         - Value: the duplicate values.
+%         - Count: the number of occurrences of the duplicate values.
+% d0p  = A variable height table containing the duplicates between 0 and 10 (exclusive), with the following columns:
+%         - Value: the duplicate values.
+%         - Count: the number of occurrences of the duplicate values.
+% d10p = A variable height table containing the duplicates greater than or equal to 10, with the following columns:
+%         - Value: the duplicate values.
+%         - Count: the number of occurrences of the duplicate values.
+% z    = An integer representing the number of zeros in the sample.
 
 function [d10n,d0n,d0p,d10p,z] = benford_duplication(varargin)
 

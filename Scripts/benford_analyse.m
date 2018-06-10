@@ -41,10 +41,10 @@ end
 
 function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
 
-%     res_1st = benford_extract(data,dran,ddec,'1ST',a,ccf,false);
+    [tab_1st,test_1st] = benford_extract(data,dran,ddec,'1ST',a,ccf,false);
 %     gof_1st = benford_gof_all(res_1st,a);
 %     
-%     res_2nd = benford_extract(data,dran,ddec,'2ND',a,ccf,false);
+    [tab_2nd,test_2nd] = benford_extract(data,dran,ddec,'2ND',a,ccf,false);
 %     gof_2nd = benford_gof_all(res_2nd,a);
 %     
 %     res_3rd = benford_extract(data,dran,ddec,'3RD',a,ccf,false);
@@ -149,7 +149,7 @@ function plot_duplication(d10n,d0n,d0p,d10p,z,ddec)
         d10p_m = min([10 d10p_h]);
         d10p_d = 10 - d10p_m;
         c = [d10p.Count(1:d10p_m); NaN(d10p_d,1)];
-        v = [arrayfun(@(x)num2str(x,fs),d10p.Value(1:d10p_m),'UniformOutput',false); repmat({'N\A'},d10p_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d10p.Value(1:d10p_m),'UniformOutput',false); repmat({'N/A'},d10p_d,1)];
         
         sub_1 = subplot(13,9,[19 58]);
         barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
@@ -171,7 +171,7 @@ function plot_duplication(d10n,d0n,d0p,d10p,z,ddec)
         d0p_m = min([10 d0p_h]);
         d0p_d = 10 - d0p_m;
         c = [d0p.Count(1:d0p_m); NaN(d0p_d,1)];
-        v = [arrayfun(@(x)num2str(x,fs),d0p.Value(1:d0p_m),'UniformOutput',false); repmat({'N\A'},d0p_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d0p.Value(1:d0p_m),'UniformOutput',false); repmat({'N/A'},d0p_d,1)];
         
         sub_2 = subplot(13,9,[24 63]);
         barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
@@ -193,7 +193,7 @@ function plot_duplication(d10n,d0n,d0p,d10p,z,ddec)
         d10n_m = min([10 d10n_h]);
         d10n_d = 10 - d10p_m;
         c = [d10n.Count(1:d10n_m); NaN(d10n_d,1)];
-        v = [arrayfun(@(x)num2str(x,fs),d10n.Value(1:d10n_m),'UniformOutput',false); repmat({'N\A'},d10n_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d10n.Value(1:d10n_m),'UniformOutput',false); repmat({'N/A'},d10n_d,1)];
         
         sub_3 = subplot(13,9,[73 112]);
         barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
@@ -215,7 +215,7 @@ function plot_duplication(d10n,d0n,d0p,d10p,z,ddec)
         d0n_m = min([10 d0n_h]);
         d0n_d = 10 - d0n_m;
         c = [d0n.Count(1:d0n_m); NaN(d0n_d,1)];
-        v = [arrayfun(@(x)num2str(x,fs),d0n.Value(1:d0n_m),'UniformOutput',false); repmat({'N\A'},d0n_d,1)];
+        v = [arrayfun(@(x)num2str(x,fs),d0n.Value(1:d0n_m),'UniformOutput',false); repmat({'N/A'},d0n_d,1)];
         
         sub_4 = subplot(13,9,[78 117]);
         barh(flipud(c),'FaceColor',[0.239 0.149 0.659]);
