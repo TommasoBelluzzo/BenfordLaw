@@ -149,37 +149,12 @@ end
 %     [so_a,so_p,so_f,so_z] = analyse_order(so_dgts,the_dgts,the_p,ccf);
 %     so_tab = table(the_dgts,so_a,the_p,so_p,the_f,so_f,so_z);
 %     so_tab.Properties.VariableNames = {'Digits' 'Amount' 'TheP' 'EmpP' 'TheF' 'EmpF' 'Z'};
-% 
-%     mant = analyse_mantissae(data);
 %     
 %     [su_a,su_p,su_f,su_z] = analyse_summation(the_dgts,the_p,fo,fo_dgts,ccf);
 %     su = table(the_dgts,su_a,the_su_p,su_p,the_su_f,su_f,su_z);
 %     su.Properties.VariableNames = {'Digits' 'Amount' 'TheP' 'EmpP' 'TheF' 'EmpF' 'Z'};
 %     
 %     bd = BenfordData(d,data,fo,fo_dgts,fo_tab,so,so_dgts,so_tab,mant,su);
-% 
-% end
-% 
-% function mant = analyse_mantissae(data)
-% 
-%     data = abs(data);
-%     l = log10(data);
-%     
-%     l_neg = l < 0;
-%     l(l_neg) = l(l_neg) + abs(ceil(l(l_neg))) + 1;
-% 
-%     mant = l - truncate(l);
-% 
-% end
-% 
-% function [a,p,f,z] = analyse_order(emp_dgts,the_dgts,the_p,ccf)
-% 
-%     n = numel(emp_dgts);
-% 
-%     a = histcounts(emp_dgts,[the_dgts; Inf]).';
-%     p = a ./ n;
-%     f = [cumsum(p(1:end-1)); 1];
-%     z = calculate_z(n,p,the_p,ccf);
 % 
 % end
 % 
@@ -200,22 +175,6 @@ end
 % 
 % end
 % 
-% function z = calculate_z(n,emp_p,the_p,ccf)
-% 
-%     z_num = abs(emp_p - the_p);
-%     z_den = sqrt((the_p .* (1 - the_p)) ./ n);
-%     
-%     if (ccf)
-%         ccf_val = 1 / (2 * n);
-% 
-%         ccf_idx = z_num > ccf_val;
-%         z_num(ccf_idx) = z_num(ccf_idx) - ccf_val;
-%     end
-%     
-%     z = z_num ./ z_den;
-% 
-% end
-% 
 % function data = generate_second_order(data)
 % 
 %     data = diff(sort(data));
@@ -224,9 +183,3 @@ end
 % 
 % end
 % 
-% function x = truncate(x)
-% 
-%     x = str2double(cellstr(num2str(x)));
-%     x = x - rem(x,1);
-% 
-% end

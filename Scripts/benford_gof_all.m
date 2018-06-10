@@ -1,7 +1,6 @@
 % [INPUT]
-% bd   = An instance of the BenfordData class produced by the "benford_data" function.
+% tab  = A table returned by the "benford_digits" function.
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the test (optional, default=0.05).
-% so   = A boolean indicating whether to perform the test on the second order data (optional, default=false).
 % sims = An integer representing the number of Monte Carlo simulations to perform (optional, default=10000).
 %
 % [OUTPUT]
@@ -16,25 +15,23 @@ function gofs = benford_gof_all(varargin)
 
     if (isempty(p))
         p = inputParser();
-        p.addRequired('bd',@(x)validateattributes(x,{'BenfordData'},{'scalar'}));
+        p.addRequired('tab',@(x)validateattributes(x,{'table'},{}));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
-        p.addOptional('so',false,@(x)validateattributes(x,{'logical'},{'scalar'}));
         p.addOptional('sims',10000,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',1000}));
     end
 
     p.parse(varargin{:});
 
     res = p.Results;
-    bd = res.bd;
+    tab = res.tab;
     a = res.a;
-    so = res.so;
     sims = res.sims;
 
-    gofs = benford_gof_all_internal(bd,a,so,sims);
+    gofs = benford_gof_all_internal(tab,a,sims);
 
 end
 
-function gofs = benford_gof_all_internal(bd,a,so,sims)
+function gofs = benford_gof_all_internal(tab,a,sims)
 
     gofs_tab = {
         'AD' false;
@@ -54,7 +51,6 @@ function gofs = benford_gof_all_internal(bd,a,so,sims)
     };
 
     gofs_len = size(gofs_tab,1);
-    
     h0 = false(gofs_len,1);
     stat = NaN(gofs_len,1);
     pval = NaN(gofs_len,1);
@@ -63,9 +59,9 @@ function gofs = benford_gof_all_internal(bd,a,so,sims)
     
     for i = 1:gofs_len
         if (gofs_tab{i,2})
-            [h0_curr,stat_curr,pval_curr] = benford_gof(bd,gofs_tab{i,1},a,so,sims);
+            [h0_curr,stat_curr,pval_curr] = benford_gof(tab,gofs_tab{i,1},a,sims);
         else
-            [h0_curr,stat_curr,pval_curr] = benford_gof(bd,gofs_tab{i,1},a,so);
+            [h0_curr,stat_curr,pval_curr] = benford_gof(tab,gofs_tab{i,1},a);
         end
         
         h0(off) = h0_curr;

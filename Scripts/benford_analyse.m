@@ -1,11 +1,11 @@
 % [INPUT]
 % data = A numeric array representing the sample on which the Benford's Law analysis must be performed.
-% ran  = A string representing the range of values to consider (optional, default='ALL').
+% dran = A string representing the range of values to consider (optional, default='ALL').
 %        Its value can be one of the following:
 %         - ALL (all values)
 %         - NEG (only negative values)
 %         - POS (only positive values)
-% dec  = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+% ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
 % a    = A float [0.01,0.10] representing the statistical significance threshold for the tests (optional, default=0.05).
 % ccf  = A boolean indicating whether to apply a continuity correction factor on Z-scores (optional, default=true).
 
@@ -16,8 +16,8 @@ function benford_analyse(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('data',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
-        p.addOptional('ran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
-        p.addOptional('dec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
+        p.addOptional('dran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
+        p.addOptional('ddec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
         p.addOptional('ccf',true,@(x)validateattributes(x,{'logical'},{'scalar'}));
     end
@@ -26,31 +26,104 @@ function benford_analyse(varargin)
 
     res = p.Results;
     data = res.data;
-    ran = res.ran;
-    dec = res.dec;
+    dran = res.dran;
+    ddec = res.ddec;
     a = res.a;
     ccf = res.ccf;
 
-    data = benford_data(data,ran,dec);
+    data_orig = data;
+    data = benford_data(data,dran,ddec);
 
-    benford_analyse_internal(data,ran,dec,a,ccf);
-
-end
-
-function benford_analyse_internal(data,ran,dec,a,ccf)
-
-    res = benford_digits(data,'L2D',a,ccf,ran,dec,false);
-
-    [mant,mant_test,mant_desc] = benford_mantissae(data,a,ran,dec,false);
-    plot_mantissae(mant,mant_test,mant_desc);
-
-%     bd2 = benford_data(data,2);
-%     gofs_fo = benford_gof_all(bd2,a,false);
-%     gofs_so = benford_gof_all(bd2,a,true);
+    benford_analyse_internal(data_orig,data,dran,ddec,a,ccf);
 
 end
 
-function plot_mantissae(mant,test,desc)
+function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
+
+%     res_1st = benford_extract(data,dran,ddec,'1ST',a,ccf,false);
+%     gof_1st = benford_gof_all(res_1st,a);
+%     
+%     res_2nd = benford_extract(data,dran,ddec,'2ND',a,ccf,false);
+%     gof_2nd = benford_gof_all(res_2nd,a);
+%     
+%     res_3rd = benford_extract(data,dran,ddec,'3RD',a,ccf,false);
+%     gof_3rd = benford_gof_all(res_3rd,a);
+% 
+%     res_f2d = benford_extract(data,dran,ddec,'F2D',a,ccf,false);
+%     gof_f2d = benford_gof_all(res_f2d,a);
+% 
+%     res_f3d = benford_extract(data,dran,ddec,'F3D',a,ccf,false);
+%     gof_f3d = benford_gof_all(res_f3d,a);
+%     
+%     res_l2d = benford_extract(data,dran,ddec,'L2D',a,ccf,false);
+%     gof_l2d = benford_gof_all(res_l2d,a);
+
+    [d10n,d0n,d0p,d10p] = benford_duplication(data_orig);
+
+%     [mant,mant_test,mant_desc] = benford_mantissae(data,dran,ddec,a,false);
+%     plot_mantissae(mant,mant_test,mant_desc,a);
+
+	[df,df_coll] = benford_df(data_orig);
+    plot_df(df,df_coll,a);
+
+end
+
+function plot_df(df,coll,a)
+
+    if (df.Significance)
+        df_sig = sprintf('Significant, p-Value: %.4f',df.pValue);
+    else
+        df_sig = sprintf('Non-Significant, p-Value: %.4f',df.pValue);
+    end
+
+    if (df.Value > 0)
+        df_res = ['DF Test: ' sprintf('%.2f%%',(df.Value * 100)) ' Overstatement (' df_sig ')'];
+    elseif (df.Value < 0)
+        df_res = ['DF Test: ' sprintf('%.2f%%',(df.Value * -100)) ' Understatement (' df_sig ')'];
+    else
+        df_res = 'DF Test: No Distortion';
+    end
+    
+    coll = round(coll,2);
+
+    fig = figure();
+    set(fig,'Name','Distortion Factor Model','Units','normalized','Position',[100 100 0.75 0.75]);
+
+    sub_1 = subplot(13,9,[10 104.5]);
+    histogram(sub_1,coll,10:10:100,'FaceAlpha',1,'FaceColor',[0.239 0.149 0.659],'Normalization','probability');
+    set(sub_1,'XLim',[10 100]);
+    title(sub_1,'Collapsed Values');
+    
+    sub_2 = subplot(13,9,[16 54],'Box','on');
+    line([0 1],repmat(39.0865,1,2),'Color','r');
+    hold on;
+        line([0 1],repmat(df.EM,1,2),'Color',[0.239 0.149 0.659],'LineStyle',':','LineWidth',1.5);
+        l1 = area(1,NaN,'FaceColor','r');
+        l2 = area(1,NaN,'FaceColor',[0.239 0.149 0.659]);
+    hold off;
+    set(sub_2,'XLim',[0 1],'XTick',[],'XTickLabel',[]);
+    set(sub_2,'YAxisLocation','right','YLim',[0 100],'YTick',[0 25 50 75 100],'YTickLabel',sprintfc('%.0f',[0 25 50 75 100].'));
+    title(sub_2,sprintf('EM: %.4f | EM Max: 39.0865',df.EM));
+
+    sub_3 = subplot(13,9,[70 108],'Box','on');
+    line([0 1],repmat(df.EM,1,2),'Color','r');
+    hold on;
+        line([0 1],repmat(df.AM,1,2),'Color',[0.239 0.149 0.659],'LineStyle',':','LineWidth',1.5);
+    hold off;
+    set(sub_3,'XLim',[0 1],'XTick',[],'XTickLabel',[]);
+    set(sub_3,'YAxisLocation','right','YLim',[0 100],'YTick',[0 25 50 75 100],'YTickLabel',sprintfc('%.0f',[0 25 50 75 100].'));
+    title(sub_3,sprintf('AM: %.4f | EM: %.4f',df.AM,df.EM));
+
+    l = legend([l1 l2],'Theorical Values','Empirical Values','Location','best','Orientation','horizontal','Units','normalized');
+    l_pos = get(l,'Position');
+    set(l,'Box','off','Position',[((1 - l_pos(3)) / 2) 0.067 l_pos(3) l_pos(4)]);
+
+    suptitle(sprintf('Distortion Factor Model (a=%.2f)\n%s',a,df_res));
+    movegui(fig,'center');
+
+end
+
+function plot_mantissae(mant,test,desc,a)
 
     mant_len = height(mant);
     the = [0; cumsum(ones(mant_len,1) ./ mant_len)];
@@ -147,7 +220,7 @@ function plot_mantissae(mant,test,desc)
     l_pos = get(l,'Position');
     set(l,'Box','off','Position',[((1 - l_pos(3)) / 2) 0.067 l_pos(3) l_pos(4)]);
     
-    suptitle(sprintf('Mantissae Analysis\nArc Test: %s (Statistic: %.4f | p-Value: %.4f)',test_res,test.Statistic,test.pValue));
+    suptitle(sprintf('Mantissae Analysis (a=%.2f)\nArc Test: %s (Statistic: %.4f | p-Value: %.4f)',a,test_res,test.Statistic,test.pValue));
     movegui(fig,'center');
 
 end

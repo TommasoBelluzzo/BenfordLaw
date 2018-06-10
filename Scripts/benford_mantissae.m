@@ -1,12 +1,12 @@
 % [INPUT]
 % data = A numeric array of n elements representing the sample on which the Mantissae Analysis must be performed.
-% a    = A float [0.01,0.10] representing the statistical significance threshold for the Mantissae Arc test (optional, default=0.05).
-% ran  = A string representing the range of values to consider (optional, default='ALL').
+% dran = A string representing the range of values to consider (optional, default='ALL').
 %        Its value can be one of the following:
 %         - ALL (all values)
 %         - NEG (only negative values)
 %         - POS (only positive values)
-% dec  = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+% ddec = An integer [0,10] representing the number of decimal places to consider (optional, default=2).
+% a    = A float [0.01,0.10] representing the statistical significance threshold for the Mantissae Arc test (optional, default=0.05).
 % btv  = A boolean indicating whether to perform data transformation and validation (optional, default=true).
 %        This input argument should be set to false only when data has already been transformed and validated by another function.
 %
@@ -30,9 +30,9 @@ function [mant,test,desc] = benford_mantissae(varargin)
     if (isempty(p))
         p = inputParser();
         p.addRequired('data',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
+        p.addOptional('dran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
+        p.addOptional('ddec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
         p.addOptional('a',0.05,@(x)validateattributes(x,{'double','single'},{'scalar','real','finite','>=',0.01,'<=',0.10}));
-        p.addOptional('ran','ALL',@(x)any(validatestring(x,{'ALL','NEG','POS'})));
-        p.addOptional('dec',2,@(x)validateattributes(x,{'numeric'},{'scalar','real','finite','integer','>=',0,'<=',10}));
         p.addOptional('btv',true,@(x)validateattributes(x,{'logical'},{'scalar'}));
     end
 
@@ -40,13 +40,13 @@ function [mant,test,desc] = benford_mantissae(varargin)
 
     res = p.Results;
     data = res.data;
+    dran = res.dran;
+    ddec = res.ddec;
     a = res.a;
-    ran = res.ran;
-    dec = res.dec;
     btv = res.btv;
 
     if (btv)
-        data = benford_data(data,ran,dec);
+        data = benford_data(data,dran,ddec);
     end
 
     switch (nargout)
