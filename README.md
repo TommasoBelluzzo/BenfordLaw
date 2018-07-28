@@ -8,9 +8,8 @@ This script represents a full-featured framework for Benford's Law conformity as
 * the `Zipf's Law Analysis`
 
 For each significant digit analysis, the following conformity indicators are provided:
-* `Goodness-of-Fit` measures (Anderson-Darling, Cramer-von Mises, Chebyshev Distance, Euclidean Distance, Freedman's U2, Likelihood Ratio, Joenssen's J2, Hotelling's Joint Digits, Judge-Schechter Mean Deviation, Kolmogorov-Smirnov, Kuiper, Freeman-Tukey T2, Watson's U2, Pearson's X2 test)
+* `Goodness-of-Fit Measures`: Anderson-Darling, Cramer-von Mises, Chebyshev Distance, Euclidean Distance, Freedman's U2, Likelihood Ratio, Joenssen's J2, Hotelling's Joint Digits, Judge-Schechter Mean Deviation, Kolmogorov-Smirnov, Kuiper, Freeman-Tukey T2, Watson's U2, Pearson's X2
 * `Mean Absolute Deviation`
-* `Sum of Square Differences`
 * `Sum of Square Differences`
 * `Z-scores`
 
