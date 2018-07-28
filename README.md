@@ -13,7 +13,7 @@ For each significant digit analysis, the following conformity indicators are pro
 * `Sum of Square Differences`
 * `Z-scores`
 
-In addition, the function `benford_random` can be used in order to produce Benford's Law conforming random numbers.
+In addition, the script is capable of producing Benford's Law conforming random numbers.
 
 ## Requirements
 
