@@ -8,10 +8,10 @@ This script represents a full-featured framework for Benford's Law conformity as
 * the `Zipf's Law Analysis`
 
 For each significant digit analysis, the following conformity indicators are provided:
-* `Z-scores`
 * `Mean Absolute Deviation`
 * `Sum of Square Differences`
-* 14 Goodness-of-Fit measures:
+* `Z-scores`
+* the following `Goodness-of-Fit` measures:
 
 %         - AD for the Anderson-Darling test (Choulakian, 1994)
 %         - CV for the Cramer-von Mises test (Choulakian, 1994)
