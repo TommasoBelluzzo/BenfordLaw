@@ -4,16 +4,17 @@ close('all');
 clearvars();
 clc();
 
-[path,~,~] = fileparts(mfilename('fullpath'));
-paths = genpath(path);
-addpath(paths);
+[path_base,~,~] = fileparts(mfilename('fullpath'));
 
-imp = importdata('\Datasets\Example.xlsx');
-data = imp.data;
+if (~endsWith(path_base,filesep()))
+    path_base = [path_base filesep()];
+end
 
-%data = importdata('\Datasets\CP.xlsx');
-%data = benford_random([1000 1],50000);
+paths_base = genpath(path_base);
+addpath(paths_base);
 
+file = fullfile(path_base,strrep('Datasets\Example_Small.xlsx','\',filesep()));
+data = importdata(file);
 benford_analyse(data);
 
-rmpath(paths);
+rmpath(paths_base);
