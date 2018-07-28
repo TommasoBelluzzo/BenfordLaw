@@ -6,6 +6,7 @@ This script represents a full-featured framework for Benford's Law conformity as
 * the `Associated Tests`: Last-Two Digits Analysis, Number Duplication Analysis, Distortion Factor Model
 * the `Mantissae Analysis`
 * the `Zipf's Law Analysis`
+
 For each significant digit analysis, the following conformity indicators are provided:
 * `Z-scores`
 * `Mean Absolute Deviation`
