@@ -41,6 +41,9 @@ end
 
 function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
 
+    plot_overview(data_orig,ddec);
+    return;
+
     bar = waitbar(0,'The dataset is being analysed...');
 
     try
@@ -74,6 +77,8 @@ function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
         delete(bar);
         rethrow(e);
     end
+    
+    
 
     plot_frequencies('First Digits',tab_1st,a);
     plot_conformity('First Digits',tab_1st,mad_1st,ssd_1st,gof_1st,a);
@@ -97,7 +102,7 @@ function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
     end
     
     plot_second_order(tab_so);
-    plot_summation(tab_sum);
+    plot_summation(tab_sum,ddec);
 
     plot_duplication(d10n,d0n,d0p,d10p,z,ddec);
     plot_mantissae(mant,mant_test,mant_desc,a);
@@ -725,6 +730,48 @@ function plot_mantissae(mant,test,desc,a)
 
 end
 
+function plot_overview(data_orig,ddec)
+
+    data_orig = data_orig(:);
+
+    data_sor = sort(unique(abs(data_orig)),'descend');
+    mag = floor(log10(data_sor(1)) + 1);
+    rsf = data_sor(1) / data_sor(2);
+
+    data_max = max(data_orig);
+    data_min = min(data_orig);
+    data_avg = mean(data_orig);
+
+    fig = figure();
+    set(fig,'Name','Dataset Overview','Units','normalized','Position',[100 100 0.85 0.85]);
+
+    sub_1 = subplot(13,9,[10 54]);
+    set(bar(data_orig,'hist'),'FaceColor',[0.239 0.149 0.659]);
+    set(sub_1,'XLim',[0.5 (numel(data_orig) + 0.5)],'XTick',[],'XTickLabel',[]);
+    set(sub_1,'YLim',[data_min data_max]);
+    t1 = title(sub_1,sprintf(sprintf('Values (Maximum: %%.%df | Minimum: %%.%df | Average: %%.%df)',ddec,ddec,ddec),data_max,data_min,data_avg));
+    set(t1,'Units','normalized');
+    t1_pos = get(t1,'Position');
+    set(t1,'Position',[0.4783 t1_pos(2) t1_pos(3)]);
+
+    sub_2 = subplot(13,9,[64 117]);
+    h = histfit(data_orig,(10 * mag),'kernel');
+    set(h(1),'FaceColor',[0.239 0.149 0.659]);
+    set(h(2),'Color','r','LineWidth',0.75)
+    t2 = title(sub_2,'Histogram & Kernel Density');
+    set(t2,'Units','normalized');
+    t2_pos = get(t2,'Position');
+    set(t2,'Position',[0.4783 t2_pos(2) t2_pos(3)]);
+
+    figure_title(sprintf(sprintf('Dataset Overview\nMagnitude: %%d | RSF: %%.%df',ddec),mag,rsf));
+
+    pause(0.01);
+
+    jfr = get(fig,'JavaFrame');
+    set(jfr,'Maximized',true);
+
+end
+
 function plot_second_order(tab)
 
     len = height(tab);
@@ -740,7 +787,7 @@ function plot_second_order(tab)
     crit(1:10:90) = ymax;
 
     fig = figure();
-    set(fig,'Name','Summation Analysis','Units','normalized','Position',[100 100 0.85 0.85]);
+    set(fig,'Name','Second Order Analysis','Units','normalized','Position',[100 100 0.85 0.85]);
 
     sub_1 = subplot(13,9,[1 108]);
     set(bar(crit,'hist'),'FaceColor',[1.000 0.840 0.000]);
@@ -778,8 +825,8 @@ function plot_summation(tab)
     
     ymax = max([tab.TheP; tab.EmpP]);
 
-    sum_max = max(tab.Summation);
-    sum_min = min(tab.Summation(tab.Summation > 0));
+    sum_max = max(tab.Smt);
+    sum_min = min(tab.Smt(tab.Smt > 0));
     avg_aes = mean(tab.AES);
     
     the_x = linspace(1,len,1000);

@@ -6,7 +6,7 @@
 % [OUTPUT]
 % tab  = A 90-by-7 table containing the summation data, with the following columns:
 %         - Digits: a vector of integers representing the ordered sequence of the first-two digits.
-%         - Summation: a vector of floats representing the summation of the sample elements having the same first-two digits.
+%         - Smt: a vector of floats representing the summation of the sample elements having the same first-two digits.
 %         - AES: a vector of floats representing the absolute excess summations.
 %         - TheP: a vector of floats representing the theoretical frequencies of the first-two digits.
 %         - TheF: a vector of floats representing the theoretical cumulative frequencies of the first-two digits.
@@ -61,6 +61,6 @@ function tab = benford_summation_internal(data,ddec)
     emp_f = [cumsum(emp_p(1:end-1)); 1];
 
     tab = table(the_dgts,s,aes,the_p,the_f,emp_p,emp_f);
-    tab.Properties.VariableNames = {'Digits' 'Summation' 'AES' 'TheP' 'TheF' 'EmpP' 'EmpF'};
+    tab.Properties.VariableNames = {'Digits' 'Smt' 'AES' 'TheP' 'TheF' 'EmpP' 'EmpF'};
 
 end
