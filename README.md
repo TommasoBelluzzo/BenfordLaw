@@ -8,11 +8,7 @@ This script represents a full-featured framework for Benford's Law conformity as
 * the `Zipf's Law Analysis`
 
 For each significant digit analysis, the following conformity indicators are provided:
-* `Mean Absolute Deviation`
-* `Sum of Square Differences`
-* `Z-scores`
-* the following `Goodness-of-Fit` measures:
-
+* `Goodness-of-Fit` measures:
   * AD for the Anderson-Darling test (Choulakian, 1994)
   * CV for the Cramer-von Mises test (Choulakian, 1994)
   * DC for the Chebyshev Distance test (Leemis, 2000)
@@ -27,6 +23,13 @@ For each significant digit analysis, the following conformity indicators are pro
   * T2 for the Freeman-Tukey T2 test (Freeman & Tukey, 1950)
   * U2 for the Watson's U2 test (Choulakian, 1994)
   * X2 for the Pearson's X2 test (Pearson, 1900)
+* `Mean Absolute Deviation`
+* `Sum of Square Differences`
+* `Sum of Square Differences`
+* `Z-scores`
+
+
+
 
 
 ## Requirements
