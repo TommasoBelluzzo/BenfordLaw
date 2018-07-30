@@ -41,9 +41,6 @@ end
 
 function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
 
-    plot_overview(data_orig,ddec);
-    return;
-
     bar = waitbar(0,'The dataset is being analysed...');
 
     try
@@ -78,7 +75,7 @@ function benford_analyse_internal(data_orig,data,dran,ddec,a,ccf)
         rethrow(e);
     end
     
-    
+    plot_overview(data_orig,ddec);
 
     plot_frequencies('First Digits',tab_1st,a);
     plot_conformity('First Digits',tab_1st,mad_1st,ssd_1st,gof_1st,a);
@@ -741,6 +738,8 @@ function plot_overview(data_orig,ddec)
     data_max = max(data_orig);
     data_min = min(data_orig);
     data_avg = mean(data_orig);
+    
+    bw = round((data_max - data_min) / (mag * iqr(data_orig) * (numel(data_orig) ^ (-1/3))),0);
 
     fig = figure();
     set(fig,'Name','Dataset Overview','Units','normalized','Position',[100 100 0.85 0.85]);
@@ -755,7 +754,7 @@ function plot_overview(data_orig,ddec)
     set(t1,'Position',[0.4783 t1_pos(2) t1_pos(3)]);
 
     sub_2 = subplot(13,9,[64 117]);
-    h = histfit(data_orig,(10 * mag),'kernel');
+    h = histfit(data_orig,bw,'kernel');
     set(h(1),'FaceColor',[0.239 0.149 0.659]);
     set(h(2),'Color','r','LineWidth',0.75)
     t2 = title(sub_2,'Histogram & Kernel Density');
