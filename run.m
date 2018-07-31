@@ -4,16 +4,16 @@ close('all');
 clearvars();
 clc();
 
-[path_base,~,~] = fileparts(mfilename('fullpath'));
+[path,~,~] = fileparts(mfilename('fullpath'));
 
-if (~endsWith(path_base,filesep()))
-    path_base = [path_base filesep()];
+if (~endsWith(path,filesep()))
+    path = [path filesep()];
 end
 
-paths_base = genpath(path_base);
+paths_base = genpath(path);
 addpath(paths_base);
 
-file = fullfile(path_base,strrep('Datasets\Example_Small.xlsx','\',filesep()));
+file = fullfile(path,strrep('Datasets\Example_Small.xlsx','\',filesep()));
 data = importdata(file);
 benford_analyse(data);
 
