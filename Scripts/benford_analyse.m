@@ -732,14 +732,14 @@ function plot_overview(data_orig,ddec)
     data_orig = data_orig(:);
 
     data_sor = sort(unique(abs(data_orig)),'descend');
-    mag = floor(log10(data_sor(1)) + 1);
-    rsf = data_sor(1) / data_sor(2);
-
     data_max = max(data_orig);
     data_min = min(data_orig);
+    data_mag = floor(log10(data_sor(1)) + 1);
+    data_rsf = data_sor(1) / data_sor(2);
     data_avg = mean(data_orig);
+    data_std = std(data_orig);
     
-    bw = round((data_max - data_min) / (mag * iqr(data_orig) * (numel(data_orig) ^ (-1/3))),0);
+    nb = round((data_max - data_min) / (2 * iqr(data_orig) * (numel(data_orig) ^ (-1/3))),0);
 
     fig = figure();
     set(fig,'Name','Dataset Overview','Units','normalized','Position',[100 100 0.85 0.85]);
@@ -748,21 +748,21 @@ function plot_overview(data_orig,ddec)
     set(bar(data_orig,'hist'),'FaceColor',[0.239 0.149 0.659]);
     set(sub_1,'XLim',[0.5 (numel(data_orig) + 0.5)],'XTick',[],'XTickLabel',[]);
     set(sub_1,'YLim',[data_min data_max]);
-    t1 = title(sub_1,sprintf(sprintf('Values (Maximum: %%.%df | Minimum: %%.%df | Average: %%.%df)',ddec,ddec,ddec),data_max,data_min,data_avg));
+    t1 = title(sub_1,'Values');
     set(t1,'Units','normalized');
     t1_pos = get(t1,'Position');
     set(t1,'Position',[0.4783 t1_pos(2) t1_pos(3)]);
 
     sub_2 = subplot(13,9,[64 117]);
-    h = histfit(data_orig,bw,'kernel');
+    h = histfit(data_orig,nb,'kernel');
     set(h(1),'FaceColor',[0.239 0.149 0.659]);
-    set(h(2),'Color','r','LineWidth',0.75)
+    set(h(2),'Color','r','LineWidth',0.75);
     t2 = title(sub_2,'Histogram & Kernel Density');
     set(t2,'Units','normalized');
     t2_pos = get(t2,'Position');
     set(t2,'Position',[0.4783 t2_pos(2) t2_pos(3)]);
 
-    figure_title(sprintf(sprintf('Dataset Overview\nMagnitude: %%d | RSF: %%.%df',ddec),mag,rsf));
+    figure_title(sprintf(sprintf('Dataset Overview\nMaximum: %%.%df | Minimum: %%.%df | Magnitude: %%d | RSF: %%.%df | Mean: %%.%df | SD: %%.%df',ddec,ddec,ddec,ddec,ddec),data_max,data_min,data_mag,data_rsf,data_avg,data_std));
 
     pause(0.01);
 
@@ -816,7 +816,7 @@ function plot_second_order(tab)
 
 end
 
-function plot_summation(tab)
+function plot_summation(tab,ddec)
 
     len = height(tab);
     seq = 1:len;
@@ -867,7 +867,7 @@ function plot_summation(tab)
     l_pos = get(l,'Position');
     set(l,'Box','off','Position',[((1 - l_pos(3)) / 2) 0.067 l_pos(3) l_pos(4)]);
     
-    figure_title(sprintf('Summation Analysis\nMaximum: %.2f | Minimum: %.2f | Average AES: %.2f',sum_max,sum_min,avg_aes));
+    figure_title(sprintf(sprintf('Summation Analysis\nMaximum: %%.%df | Minimum: %%.%df | Average AES: %%.%df',ddec,ddec,ddec),sum_max,sum_min,avg_aes));
 
     pause(0.01);
 
