@@ -54,7 +54,7 @@ function data = benford_data_internal(data,dran,ddec)
     end
     
     if (numel(data) < 1000)
-        warning('A minimum sample size of 1000 valid observations is recommended in order to produce a coherent analysis.');
+        warning('A minimum sample size of 1000 valid observations is recommended in order to produce a consistent analysis.');
     end
 
 end
