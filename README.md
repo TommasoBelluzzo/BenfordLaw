@@ -9,7 +9,7 @@ This script represents a full-featured framework for Benford's Law conformity as
 
 For each significant digit analysis, the following conformity indicators are provided:
 
-* Goodness-of-Fit Measures (14):
+* **Goodness-of-Fit Measures (14):**
   * Anderson-Darling Discrete (Choulakian, 1994)
   * Chebyshev Distance (Leemis, 2000)
   * Cramer-von Mises Discrete (Choulakian, 1994)
@@ -23,9 +23,9 @@ For each significant digit analysis, the following conformity indicators are pro
   * Likelihood Ratio (Neyman & Pearson, 1933)
   * Pearson's X2 (Pearson, 1900)
   * Watson's U2 (Choulakian, 1994)
-* Mean Absolute Deviation
-* Sum of Square Differences
-* Z-scores
+* **Mean Absolute Deviation**
+* **Sum of Square Differences**
+* **Z-Scores**
 
 In addition, the script is capable of producing Benford's Law conforming random numbers.
 
