@@ -32,3 +32,13 @@ In addition, the script is capable of producing Benford's Law conforming random 
 ## Requirements
 
 The minimum Matlab version required is `R2014a`. In addition, the `Statistics and Machine Learning Toolbox` must be installed in order to properly execute the script.
+
+## Usage
+
+1. Create a properly structured database (see the paragraph below).
+1. Edit the `run.m` script following your needs.
+1. Execute the `run.m` script.
+
+## Dataset
+
+This script doesn't require a dataset. Numeric data can be 
