@@ -1,6 +1,6 @@
 # Benford Law
 
-This script represents a full-featured framework for assessing Benford's Law conformity and producing random numbers whose digits follow the Benford's Law distribution. For what concerns the assessment, it be used in order to perform all the tests proposed by Nigrini et al. (2012):
+This script represents a full-featured framework for assessing Benford's Law conformity. It be used in order to perform all the tests proposed by Nigrini et al. (2012):
 
 * the `Primary Tests`: First Digits Analysis, Second Digits Analysis, First-Two Digits
 * the `Advanced Tests`: Third Digits Analysis, Second Order Analysis, Summation Analysis
@@ -36,7 +36,7 @@ The minimum Matlab version required is `R2014a`. In addition, the `Statistics an
 
 The framework doesn't require any specific dataset structure. Numeric data can be extracted from any source of produced following any methodology, but a minimum amount of 1000 elements (with at least 50 unique observations) is required in order to perform coherent analyses.
 
-The `run.m` script provides an example of how this framework can be used, but all the functions located in the `Scripts` folder can be executed in standalone computation processes. It is recommended to validate and pre-process the dataset using the `benford_data` function. The `benford_analyse` functions can be used in order to perform a full automatic analysis of the dataset and plot the results. The `benford_random` function produces Benford's Law conforming random numbers.
+The `run.m` script provides an example of how this framework can be used, but all the functions located in the `Scripts` folder can be executed in standalone computation processes. It is recommended to validate and pre-process the dataset using the `benford_data` function. The `benford_analyse` functions can be used in order to perform a full automatic analysis of the dataset and plot the results. The `benford_random` function is an additional tool that produces random numbers whose digits follow the Benford's Law distribution.
 
 ## Screenshots
 
