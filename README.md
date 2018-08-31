@@ -1,6 +1,7 @@
 # Benford Law
 
-This script represents a full-featured framework for Benford's Law conformity assessment. It can be used in order to perform the following tests proposed by Nigrini et al. (2012):
+This script represents a full-featured framework for assessing Benford's Law conformity and producing random numbers whose digits follow the Benford's Law distribution. For what concerns the assessment, it be used in order to perform all the tests proposed by Nigrini et al. (2012):
+
 * the `Primary Tests`: First Digits Analysis, Second Digits Analysis, First-Two Digits
 * the `Advanced Tests`: Third Digits Analysis, Second Order Analysis, Summation Analysis
 * the `Associated Tests`: Last-Two Digits Analysis, Number Duplication Analysis, Distortion Factor Model
@@ -27,17 +28,13 @@ For each significant digit analysis, the following conformity indicators are pro
 * **Sum of Square Differences**
 * **Z-Scores**
 
-In addition, the script is capable of producing Benford's Law conforming random numbers.
-
 ## Requirements
 
 The minimum Matlab version required is `R2014a`. In addition, the `Statistics and Machine Learning Toolbox` must be installed in order to properly execute the script.
 
 ## Usage
 
-1. Create a properly structured database (see the paragraph below).
-1. Edit the `run.m` script following your needs.
-1. Execute the `run.m` script.
+The `run.m` script represents an usage example of 
 
 ## Dataset
 
