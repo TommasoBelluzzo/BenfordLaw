@@ -32,10 +32,12 @@ For each significant digit analysis, the following conformity indicators are pro
 
 The minimum Matlab version required is `R2014a`. In addition, the `Statistics and Machine Learning Toolbox` must be installed in order to properly execute the script.
 
-## Usage
+## Dataset & Usage 
 
-The `run.m` script represents an usage example of 
+The framework doesn't require any specific dataset structure. Numeric data can be extracted from any source of produced following any methodology, but a minimum amount of 1000 elements (with at least 50 unique observations) is required in order to perform coherent analyses.
 
-## Dataset
+The `run.m` script provides an example of how this framework can be used, but all the functions located in the `Scripts` folder can be executed in standalone computation processes. It is recommended to validate and pre-process the dataset using the `benford_data` function. The `benford_analyse` functions can be used in order to perform a full automatic analysis of the dataset and plot the results. The `benford_random` function produces Benford's Law conforming random numbers.
 
-This script doesn't require a dataset. Numeric data can be 
+## Screenshots
+
+
