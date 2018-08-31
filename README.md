@@ -40,4 +40,12 @@ The `run.m` script provides an example of how this framework can be used, but al
 
 ## Screenshots
 
+![Second Digits Analysis 1](https://i.imgur.com/fL3fbgO.png)
 
+![Second Digits Analysis 2](https://i.imgur.com/rpRonnV.png)
+
+![First-Two Digits Analysis 1](https://i.imgur.com/FDWDGBj.png)
+
+![First-Two Digits Analysis 2](https://i.imgur.com/MEkU0pm.png)
+
+![Mantissae Analysis](https://i.imgur.com/x0L5tqV.png)
