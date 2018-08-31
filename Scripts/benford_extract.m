@@ -35,7 +35,7 @@
 %         - Conformity: a vector of strings representing the conformity level.
 %         - Threshold: a vector of floats representing the conformity thresholds.
 %         - MAD: a vector containing 3 NaN values and a float (the MAD value of the sample located at its respective conformity level).
-% ssd  = A 4-by-3 table containing the  Sum of Square Differences test result, with the following columns:
+% ssd  = A 4-by-3 table containing the Sum of Square Differences test result, with the following columns:
 %         - Conformity: a vector of strings representing the conformity level.
 %         - Threshold: a vector of floats representing the conformity thresholds.
 %         - MAD: a vector containing 3 NaN values and a float (the SSD value of the sample located at its respective conformity level).
