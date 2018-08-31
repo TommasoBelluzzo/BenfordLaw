@@ -24,9 +24,9 @@ For each significant digit analysis, the following conformity indicators are pro
   * Likelihood Ratio (Neyman & Pearson, 1933)
   * Pearson's X2 (Pearson, 1900)
   * Watson's U2 Discrete (Choulakian, 1994)
-* **Mean Absolute Deviation**
-* **Sum of Square Differences**
-* **Z-Scores**
+* **Mean Absolute Deviation** (Nigrini et al., 2012)
+* **Sum of Square Differences** (Kossovsky, 2014)
+* **Z-Scores** (Nigrini et al., 2012)
 
 ## Requirements
 
