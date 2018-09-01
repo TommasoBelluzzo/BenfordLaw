@@ -1,6 +1,6 @@
 # Benford Law
 
-This script represents a full-featured framework for assessing Benford's Law conformity. It be used in order to perform all the tests proposed by Nigrini et al. (2012):
+This script represents a full-featured framework for assessing Benford's Law conformity. It can be used in order to perform all the tests proposed by Nigrini et al. (2012):
 
 * the `Primary Tests`: First Digits Analysis, Second Digits Analysis, First-Two Digits
 * the `Advanced Tests`: Third Digits Analysis, Second Order Analysis, Summation Analysis
