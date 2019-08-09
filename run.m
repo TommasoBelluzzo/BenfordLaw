@@ -60,7 +60,7 @@ end
 paths_base = [strjoin(paths_base,';') ';'];
 addpath(paths_base);
 
-file = fullfile(path,strrep('Datasets\Example_Small.xlsx','\',filesep()));
+file = fullfile(path_base,['Datasets' filesep() 'Example_Small.xlsx']);
 data = importdata(file);
 benford_analyse(data);
 
