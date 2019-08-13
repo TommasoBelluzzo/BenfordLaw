@@ -1,6 +1,6 @@
 # Benford Law
 
-This script represents a full-featured framework for assessing Benford's Law conformity. It can be used in order to perform all the tests proposed by Nigrini et al. (2012):
+This script represents a full-featured framework for assessing Benford's Law conformity. It can be used in order to perform all the tests proposed by [Nigrini et al. (2012)](https://www.nigrini.com/):
 
 * the `Primary Tests`: First Digits Analysis, Second Digits Analysis, First-Two Digits
 * the `Advanced Tests`: Third Digits Analysis, Second Order Analysis, Summation Analysis
@@ -24,9 +24,9 @@ For each significant digit analysis, the following conformity indicators are pro
   * Likelihood Ratio (Neyman & Pearson, 1933)
   * Pearson's X2 (Pearson, 1900)
   * Watson's U2 Discrete (Choulakian, 1994)
-* **Mean Absolute Deviation** (Nigrini et al., 2012)
+* **Mean Absolute Deviation** ([Nigrini et al., 2012](https://www.nigrini.com/))
 * **Sum of Square Differences** (Kossovsky, 2014)
-* **Z-Scores** (Nigrini et al., 2012)
+* **Z-Scores** ([Nigrini et al., 2012](https://www.nigrini.com/))
 
 ## Requirements
 
