@@ -18,7 +18,7 @@ For each significant digit analysis, the following conformity indicators are pro
   * Freedman's U2 (Freedman, 1981)
   * Freeman-Tukey T2 (Freeman & Tukey, 1950)
   * Hotelling's Joint Digits (Hotelling, 1931)
-  * Judge-Schechter Mean Deviation (Judge & Schechter, 2009)
+  * Judge-Schechter Mean Deviation ([Judge & Schechter, 2009](https://www.researchgate.net/publication/228313715_Detecting_Problems_in_Survey_Data_Using_Benford's_Law))
   * Kolmogorov-Smirnov (Kolomonorgov, 1933)
   * Kuiper (Kuiper, 1960)
   * Likelihood Ratio (Neyman & Pearson, 1933)
