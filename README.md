@@ -12,9 +12,9 @@ For each significant digit analysis, the following conformity indicators are pro
 
 * **Goodness-of-Fit Measures (14):**
   * Anderson-Darling Discrete ([Choulakian et al., 1994](https://www.researchgate.net/publication/245812965_Cramer-von_Mises_statistics_for_discrete_distributions))
-  * Chebyshev Distance (Leemis, 2000)
+  * Chebyshev Distance ([Leemis et al., 2000](https://www.researchgate.net/publication/2483540_Survival_Distributions_Satisfying_Benford's_Law))
   * Cramer-von Mises Discrete ([Choulakian et al., 1994](https://www.researchgate.net/publication/245812965_Cramer-von_Mises_statistics_for_discrete_distributions))
-  * Euclidean Distance (Cho & Gaines, 2007)
+  * Euclidean Distance ([Cho & Gaines, 2007](https://www.researchgate.net/publication/243102672_Breaking_the_Benford_Law))
   * Freedman's U2 (Freedman, 1981)
   * Freeman-Tukey T2 (Freeman & Tukey, 1950)
   * Hotelling's Joint Digits (Hotelling, 1931)
