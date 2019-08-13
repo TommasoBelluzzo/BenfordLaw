@@ -25,7 +25,7 @@ For each significant digit analysis, the following conformity indicators are pro
   * Pearson's X2 (Pearson, 1900)
   * Watson's U2 Discrete (Choulakian, 1994)
 * **Mean Absolute Deviation** ([Nigrini et al., 2012](https://www.nigrini.com/))
-* **Sum of Square Differences** (Kossovsky, 2014)
+* **Sum of Square Differences** ([Kossovsky, 2014](https://www.researchgate.net/publication/316552141_Benford's_law_Theory_the_general_law_of_relative_quantities_and_forensic_fraud_detection_applications))
 * **Z-Scores** ([Nigrini et al., 2012](https://www.nigrini.com/))
 
 ## Requirements
