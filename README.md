@@ -11,9 +11,9 @@ This script represents a full-featured framework for assessing Benford's Law con
 For each significant digit analysis, the following conformity indicators are provided:
 
 * **Goodness-of-Fit Measures (14):**
-  * Anderson-Darling Discrete (Choulakian, 1994)
+  * Anderson-Darling Discrete ([Choulakian et al., 1994](https://www.researchgate.net/publication/245812965_Cramer-von_Mises_statistics_for_discrete_distributions))
   * Chebyshev Distance (Leemis, 2000)
-  * Cramer-von Mises Discrete (Choulakian, 1994)
+  * Cramer-von Mises Discrete ([Choulakian et al., 1994](https://www.researchgate.net/publication/245812965_Cramer-von_Mises_statistics_for_discrete_distributions))
   * Euclidean Distance (Cho & Gaines, 2007)
   * Freedman's U2 (Freedman, 1981)
   * Freeman-Tukey T2 (Freeman & Tukey, 1950)
@@ -23,7 +23,7 @@ For each significant digit analysis, the following conformity indicators are pro
   * Kuiper (Kuiper, 1960)
   * Likelihood Ratio (Neyman & Pearson, 1933)
   * Pearson's X2 (Pearson, 1900)
-  * Watson's U2 Discrete (Choulakian, 1994)
+  * Watson's U2 Discrete ([Choulakian et al., 1994](https://www.researchgate.net/publication/245812965_Cramer-von_Mises_statistics_for_discrete_distributions))
 * **Mean Absolute Deviation** ([Nigrini et al., 2012](https://www.nigrini.com/))
 * **Sum of Square Differences** ([Kossovsky, 2014](https://www.researchgate.net/publication/316552141_Benford's_law_Theory_the_general_law_of_relative_quantities_and_forensic_fraud_detection_applications))
 * **Z-Scores** ([Nigrini et al., 2012](https://www.nigrini.com/))
